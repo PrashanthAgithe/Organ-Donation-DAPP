@@ -4,20 +4,31 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner"; // Import Sonner for notifications
+import { toast } from "sonner";
 import { contractProvider, contractSigner } from "@/contract";
 import { uploadDonorData } from "@/main";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogTrigger
+} from "../components/ui/alert-dialog";
 
 const DonorRegistration = () => {
   const navigate = useNavigate();
+  const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState({
-    // donorId: "",
     name: "",
     age: "",
     bloodType: "",
     organsAvailable: [],
     contactInfo: "",
-    status: "alive", // Default status
+    status: "alive",
   });
 
   const organsList = ["Heart", "Liver", "Kidney", "Lungs", "Pancreas", "Intestines", "Corneas"];
@@ -35,33 +46,31 @@ const DonorRegistration = () => {
     }));
   };
 
-  const handleSubmit = async(e) => {
-    e.preventDefault();
-    const id=await contractProvider.getCurrentAvailableDonorID();
-    console.log("Form Data:",formData);
-    let donordata={
+  const handleConfirmSubmit = async () => {
+    const id = await contractProvider.getCurrentAvailableDonorID();
+    console.log("Form Data:", formData);
+    let donordata = {
       ...formData,
-      donorId:"D"+String(Number(id)),
-    }
-    console.log("Donor Data:",donordata);
+      donorId: "D" + String(Number(id)),
+    };
+    console.log("Donor Data:", donordata);
 
-    const cid=await uploadDonorData(donordata);
-    console.log("cid:",cid);
-    const tx=await contractSigner.registerDonor(donordata.donorId,cid);
+    const cid = await uploadDonorData(donordata);
+    console.log("cid:", cid);
+    const tx = await contractSigner.registerDonor(donordata.donorId, cid);
     await tx.wait();
-    // Show toast notification
-    toast('Registration Successful',{
-        style: {
-          backgroundColor: '#4CAF50', // Green background
-          color: 'white',
-          fontSize: '16px',
-          borderRadius: '8px',
-          padding: '12px 24px',
-        },
-        duration: 3000, // Show for 5 seconds
-      })
 
-    // Redirect to home page after 2 seconds
+    toast('Registration Successful', {
+      style: {
+        backgroundColor: '#4CAF50',
+        color: 'white',
+        fontSize: '16px',
+        borderRadius: '8px',
+        padding: '12px 24px',
+      },
+      duration: 3000,
+    });
+
     setTimeout(() => {
       navigate("/");
     }, 2000);
@@ -71,30 +80,25 @@ const DonorRegistration = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
         <h2 className="text-2xl font-bold text-center mb-4">Donor Registration</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          
-          {/* <div>
-            <Label htmlFor="donorId">Donor ID</Label>
-            <Input type="text" name="donorId" value={formData.donorId} onChange={handleChange} required />
-          </div> */}
+        <form onSubmit={(e) => { e.preventDefault(); setOpenDialog(true); }} className="space-y-4">
 
           <div>
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name" className="my-3">Name</Label>
             <Input type="text" name="name" value={formData.name} onChange={handleChange} required />
           </div>
 
           <div>
-            <Label htmlFor="age">Age</Label>
+            <Label htmlFor="age" className="my-3">Age</Label>
             <Input type="number" name="age" value={formData.age} onChange={handleChange} required />
           </div>
 
           <div>
-            <Label htmlFor="bloodType">Blood Type</Label>
+            <Label htmlFor="bloodType" className="my-3">Blood Type</Label>
             <Input type="text" name="bloodType" value={formData.bloodType} onChange={handleChange} required />
           </div>
 
           <div>
-            <Label>Organs Available</Label>
+            <Label className="my-3">Organs Available</Label>
             <div className="grid grid-cols-2 gap-2">
               {organsList.map((organ) => (
                 <Button
@@ -110,12 +114,12 @@ const DonorRegistration = () => {
           </div>
 
           <div>
-            <Label htmlFor="contactInfo">Contact Info</Label>
+            <Label htmlFor="contactInfo" className="my-3">Contact Info</Label>
             <Input type="text" name="contactInfo" value={formData.contactInfo} onChange={handleChange} required />
           </div>
 
           <div>
-            <Label>Status</Label>
+            <Label className="my-3">Status</Label>
             <Select onValueChange={(value) => setFormData({ ...formData, status: value })}>
               <SelectTrigger>
                 <SelectValue placeholder="Select Status" />
@@ -130,6 +134,28 @@ const DonorRegistration = () => {
           <Button type="submit" className="w-full bg-blue-600 text-white py-2">Register Donor</Button>
         </form>
       </div>
+
+      <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Donor Details</AlertDialogTitle>
+            <AlertDialogDescription>
+              <div className="space-y-2 text-left">
+                <p><strong>Name:</strong> {formData.name}</p>
+                <p><strong>Age:</strong> {formData.age}</p>
+                <p><strong>Blood Type:</strong> {formData.bloodType}</p>
+                <p><strong>Organs Available:</strong> {formData.organsAvailable.join(", ")}</p>
+                <p><strong>Contact Info:</strong> {formData.contactInfo}</p>
+                <p><strong>Status:</strong> {formData.status}</p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmSubmit}>Submit</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
