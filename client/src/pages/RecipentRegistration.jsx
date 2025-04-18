@@ -53,27 +53,27 @@ const RecipientRegistration = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           
           <div>
-            <Label htmlFor="recipientId">Recipient ID</Label>
+            <Label htmlFor="recipientId" className="my-3">Recipient ID</Label>
             <Input type="text" name="recipientId" value={formData.recipientId} onChange={handleChange} required />
           </div>
 
           <div>
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name" className="my-3">Name</Label>
             <Input type="text" name="name" value={formData.name} onChange={handleChange} required />
           </div>
 
           <div>
-            <Label htmlFor="age">Age</Label>
+            <Label htmlFor="age" className="my-3">Age</Label>
             <Input type="number" name="age" value={formData.age} onChange={handleChange} required />
           </div>
 
           <div>
-            <Label htmlFor="bloodType">Blood Type</Label>
+            <Label htmlFor="bloodType" className="my-3">Blood Type</Label>
             <Input type="text" name="bloodType" value={formData.bloodType} onChange={handleChange} required />
           </div>
 
           <div>
-            <Label>Required Organ</Label>
+            <Label className="my-3">Required Organ</Label>
             <Select onValueChange={(value) => setFormData({ ...formData, requiredOrgan: value })}>
               <SelectTrigger>
                 <SelectValue placeholder="Select Organ" />
@@ -89,7 +89,7 @@ const RecipientRegistration = () => {
           </div>
 
           <div>
-            <Label>Urgency Level</Label>
+            <Label className="my-3">Urgency Level</Label>
             <Select onValueChange={(value) => setFormData({ ...formData, urgency: value })}>
               <SelectTrigger>
                 <SelectValue placeholder="Select Urgency" />
@@ -103,7 +103,7 @@ const RecipientRegistration = () => {
           </div>
 
           <div>
-            <Label htmlFor="contactInfo">Contact Info</Label>
+            <Label htmlFor="contactInfo" className="my-3">Contact Info</Label>
             <Input type="text" name="contactInfo" value={formData.contactInfo} onChange={handleChange} required />
           </div>
 
