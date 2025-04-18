@@ -42,7 +42,7 @@ const RecipientRegistration = () => {
 
     // Redirect to home page after 2 seconds
     setTimeout(() => {
-      navigate("/home");
+      navigate("/");
     }, 2000);
   };
 
