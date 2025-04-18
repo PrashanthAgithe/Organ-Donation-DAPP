@@ -38,6 +38,7 @@ contract OrganDonationContract {
     mapping(string => Donor) private donors;
     mapping(string => Recipient) private recipients;
     
+    mapping(string => string) private donorCIDs;
     // Array to store matched records
     MatchedRecord[] private matchedRecords;
     
@@ -46,29 +47,32 @@ contract OrganDonationContract {
     event RecipientRegistered(string recipientId, string name);
     event MatchCreated(string recordId, string donorId, string recipientId, string organ, uint matchDate);
     
-    function registerDonor(
-        string memory _donorId,
-        string memory _name,
-        uint8 _age,
-        string memory _bloodType,
-        string[] memory _organsAvailable,
-        string memory _contactInfo,
-        string memory _status
-    ) public returns (bool) {
-        // In production, you may want to check if the donor already exists.
-        donors[_donorId] = Donor({
-            donorId: _donorId,
-            name: _name,
-            age: _age,
-            bloodType: _bloodType,
-            organsAvailable: _organsAvailable,
-            contactInfo: _contactInfo,
-            status: _status
-        });
-        
-        emit DonorRegistered(_donorId, _name);
-        return true;
+    function registerDonor(string memory donorId,string memory cid) public {
+        donorCIDs[donorId]=cid;
     }
+    // function registerDonor(
+    //     string memory _donorId,
+    //     string memory _name,
+    //     uint8 _age,
+    //     string memory _bloodType,
+    //     string[] memory _organsAvailable,
+    //     string memory _contactInfo,
+    //     string memory _status
+    // ) public returns (bool) {
+    //     // In production, you may want to check if the donor already exists.
+    //     donors[_donorId] = Donor({
+    //         donorId: _donorId,
+    //         name: _name,
+    //         age: _age,
+    //         bloodType: _bloodType,
+    //         organsAvailable: _organsAvailable,
+    //         contactInfo: _contactInfo,
+    //         status: _status
+    //     });
+        
+    //     emit DonorRegistered(_donorId, _name);
+    //     return true;
+    // }
     
     function registerRecipient(
         string memory _recipientId,
@@ -129,7 +133,7 @@ contract OrganDonationContract {
     function getMatchedRecords() public view returns (MatchedRecord[] memory) {
         return matchedRecords;
     }
-
+    
     function getMessage() public pure returns (string memory) {
         return "Blockchain Connected successfully!";
     }
