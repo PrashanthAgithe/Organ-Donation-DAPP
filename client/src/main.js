@@ -1,12 +1,23 @@
 import { contractProvider, contractSigner } from './contract';
 
+export const getAlldonorIDs = async () =>{
+  try {
+    const tx=await contractProvider.getDonorIDs();
+    console.log(tx);
+    const donorIDs = Array.from(tx);
+    console.log(donorIDs);
+    return donorIDs;
+  } catch (error) {
+    console.log("Error in getting donor IDs from Blockchain",error);
+  }
+}
 export const insertMatchedRecord = async () => {
   try {
     const tx = await contractSigner.createMatch(
       "REC123",
       "DON456",
       "REC789",
-      "Kidney",
+      "Heart",
       Math.floor(Date.now() / 1000),
       "matched"
     );
@@ -28,7 +39,7 @@ export const getAllMatchedRecords = async () => {
       matchDate: record.matchDate.toString(),
       status: record.status
     }));
-
+    // const MatchedRecords = Array.from(tx);
     console.log("MatchedRecords Length:", MatchedRecords.length);
     console.log("MatchedRecords:", MatchedRecords);
     return MatchedRecords;
@@ -115,3 +126,12 @@ export const retrieveDonorData = async (cid) => {
     throw error;
   }
 };
+
+// export const deleteData = async (cid) => {
+//   try {
+//     await ipfs.pin.rm(cid); // Unpin from local node
+//     console.log(`Unpinned CID ${cid} from local IPFS node.`);
+//   } catch (error) {
+//     console.error(`Error unpinning CID ${cid}:`, error);
+//   }
+// };

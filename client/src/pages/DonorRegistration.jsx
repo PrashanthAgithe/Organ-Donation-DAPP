@@ -5,11 +5,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner"; // Import Sonner for notifications
+import { contractProvider, contractSigner } from "@/contract";
+import { uploadDonorData } from "@/main";
 
 const DonorRegistration = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    donorId: "",
+    // donorId: "",
     name: "",
     age: "",
     bloodType: "",
@@ -33,10 +35,20 @@ const DonorRegistration = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log("Donor Data:", formData);
+    const id=await contractProvider.getCurrentAvailableDonorID();
+    console.log("Form Data:",formData);
+    let donordata={
+      ...formData,
+      donorId:"D"+String(Number(id)),
+    }
+    console.log("Donor Data:",donordata);
 
+    const cid=await uploadDonorData(donordata);
+    console.log("cid:",cid);
+    const tx=await contractSigner.registerDonor(donordata.donorId,cid);
+    await tx.wait();
     // Show toast notification
     toast('Registration Successful',{
         style: {
@@ -61,10 +73,10 @@ const DonorRegistration = () => {
         <h2 className="text-2xl font-bold text-center mb-4">Donor Registration</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           
-          <div>
+          {/* <div>
             <Label htmlFor="donorId">Donor ID</Label>
             <Input type="text" name="donorId" value={formData.donorId} onChange={handleChange} required />
-          </div>
+          </div> */}
 
           <div>
             <Label htmlFor="name">Name</Label>

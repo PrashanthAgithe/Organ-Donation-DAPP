@@ -37,8 +37,10 @@ contract OrganDonationContract {
     // Mappings for storing donors and recipients by their IDs
     mapping(string => Donor) private donors;
     mapping(string => Recipient) private recipients;
-    
+
+    uint private CurrentAvailableDonorID=0;
     mapping(string => string) private donorCIDs;
+    string[] private donorIDs;
     // Array to store matched records
     MatchedRecord[] private matchedRecords;
     
@@ -47,8 +49,20 @@ contract OrganDonationContract {
     event RecipientRegistered(string recipientId, string name);
     event MatchCreated(string recordId, string donorId, string recipientId, string organ, uint matchDate);
     
+    function getCurrentAvailableDonorID() public view returns(uint) {
+        return CurrentAvailableDonorID;
+    }
+
     function registerDonor(string memory donorId,string memory cid) public {
         donorCIDs[donorId]=cid;
+        donorIDs.push(donorId);
+        CurrentAvailableDonorID++;
+    }
+    function getDonorIDs() public view returns (string[] memory){
+        return donorIDs;
+    }
+    function getDonorCID(string memory _donorId) public view returns (string memory) {
+        return donorCIDs[_donorId];
     }
     // function registerDonor(
     //     string memory _donorId,
@@ -119,9 +133,6 @@ contract OrganDonationContract {
         return true;
     }
     
-    function getDonor(string memory _donorId) public view returns (Donor memory) {
-        return donors[_donorId];
-    }
     
     function getRecipient(string memory _recipientId) public view returns (Recipient memory) {
         return recipients[_recipientId];
