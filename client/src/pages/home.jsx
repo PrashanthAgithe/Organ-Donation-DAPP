@@ -43,10 +43,10 @@ const LandingPage = () => {
             Recipient Registration
           </Button>
           <Button 
-          onClick={getAllMatchedRecords}
+          onClick={()=>navigate('/getMatchedRecords')}
           className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
           >
-            getAllMatchedRecords
+            Get All Matched Records
           </Button>
         </div>
       </header>
