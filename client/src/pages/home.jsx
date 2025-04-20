@@ -5,7 +5,7 @@ import { FaEthereum } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 import {contractProvider,contractSigner} from "../contract";
-import {getAlldonorIDs, getAllMatchedRecords, insertMatchedRecord} from "../main"
+import {getAlldonorIDs, getAllMatchedRecords, getAllrecipientIDs, insertMatchedRecord} from "../main"
 import { uploadDonorData,retrieveDonorData } from "../main";
 const LandingPage = () => {
 
@@ -43,10 +43,10 @@ const LandingPage = () => {
             Recipient Registration
           </Button>
           <Button 
-          onClick={getAlldonorIDs}
+          onClick={getAllMatchedRecords}
           className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
           >
-            getDonorIDs
+            getAllMatchedRecords
           </Button>
         </div>
       </header>

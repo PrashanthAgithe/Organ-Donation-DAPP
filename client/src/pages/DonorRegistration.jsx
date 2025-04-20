@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { contractProvider, contractSigner } from "@/contract";
-import { uploadDonorData } from "@/main";
+import { runMatching, uploadDonorData } from "@/main";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +22,18 @@ import {
 const DonorRegistration = () => {
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
+
+  const [nextID,setnextID] = useState("");
+  const [isloading,setisloading] = useState(false);
+  
+  useEffect(()=>{
+    async function getnextID(){
+      const id = await contractProvider.getCurrentAvailableDonorID();
+      setnextID("D" + String(Number(id)));
+    }
+    getnextID();
+  },[]);
+
   const [formData, setFormData] = useState({
     name: "",
     age: "",
@@ -47,16 +59,16 @@ const DonorRegistration = () => {
   };
 
   const handleConfirmSubmit = async () => {
-    const id = await contractProvider.getCurrentAvailableDonorID();
-    console.log("Form Data:", formData);
+    setisloading(true);
+    // console.log("Form Data:", formData);
     let donordata = {
       ...formData,
-      donorId: "D" + String(Number(id)),
+      donorId:nextID,
     };
-    console.log("Donor Data:", donordata);
+    // console.log("Donor Data:", donordata);
 
     const cid = await uploadDonorData(donordata);
-    console.log("cid:", cid);
+    // console.log("cid:", cid);
     const tx = await contractSigner.registerDonor(donordata.donorId, cid);
     await tx.wait();
 
@@ -70,10 +82,11 @@ const DonorRegistration = () => {
       },
       duration: 3000,
     });
-
+    setisloading(false);
     setTimeout(() => {
       navigate("/");
-    }, 2000);
+    }, 300);
+    runMatching();
   };
 
   return (
@@ -131,7 +144,14 @@ const DonorRegistration = () => {
             </Select>
           </div>
 
-          <Button type="submit" className="w-full bg-blue-600 text-white py-2">Register Donor</Button>
+          <Button
+            type="submit"
+            disabled={isloading}
+            className={`w-full ${isloading ? "bg-blue-200 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"} text-white py-2`}
+          >
+            {isloading ? "Registering..." : "Register Donor"}
+          </Button>
+
         </form>
       </div>
 
@@ -139,8 +159,9 @@ const DonorRegistration = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Donor Details</AlertDialogTitle>
-            <AlertDialogDescription>
-              <div className="space-y-2 text-left">
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-left text-sm text-muted-foreground">
+                <p><strong>Donor ID:</strong> {nextID}</p>
                 <p><strong>Name:</strong> {formData.name}</p>
                 <p><strong>Age:</strong> {formData.age}</p>
                 <p><strong>Blood Type:</strong> {formData.bloodType}</p>
@@ -152,10 +173,13 @@ const DonorRegistration = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmSubmit}>Submit</AlertDialogAction>
+            <AlertDialogAction onClick={handleConfirmSubmit}>
+              Submit
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
     </div>
   );
 };

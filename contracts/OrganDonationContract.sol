@@ -39,8 +39,15 @@ contract OrganDonationContract {
     mapping(string => Recipient) private recipients;
 
     uint private CurrentAvailableDonorID=0;
+    uint private CurrentAvailableRecipientID=0;
+    uint private CurrentAvailableMatchedID=0;
+
     mapping(string => string) private donorCIDs;
+    mapping(string => string) private recipientCIDs;
+    
     string[] private donorIDs;
+    string[] private recipientIDs;
+
     // Array to store matched records
     MatchedRecord[] private matchedRecords;
     
@@ -58,59 +65,69 @@ contract OrganDonationContract {
         donorIDs.push(donorId);
         CurrentAvailableDonorID++;
     }
+
     function getDonorIDs() public view returns (string[] memory){
         return donorIDs;
     }
+
     function getDonorCID(string memory _donorId) public view returns (string memory) {
         return donorCIDs[_donorId];
     }
-    // function registerDonor(
-    //     string memory _donorId,
-    //     string memory _name,
-    //     uint8 _age,
-    //     string memory _bloodType,
-    //     string[] memory _organsAvailable,
-    //     string memory _contactInfo,
-    //     string memory _status
-    // ) public returns (bool) {
-    //     // In production, you may want to check if the donor already exists.
-    //     donors[_donorId] = Donor({
-    //         donorId: _donorId,
-    //         name: _name,
-    //         age: _age,
-    //         bloodType: _bloodType,
-    //         organsAvailable: _organsAvailable,
-    //         contactInfo: _contactInfo,
-    //         status: _status
-    //     });
-        
-    //     emit DonorRegistered(_donorId, _name);
-    //     return true;
-    // }
-    
-    function registerRecipient(
-        string memory _recipientId,
-        string memory _name,
-        uint8 _age,
-        string memory _bloodType,
-        string memory _requiredOrgan,
-        string memory _urgency,
-        string memory _contactInfo
-    ) public returns (bool) {
-        recipients[_recipientId] = Recipient({
-            recipientId: _recipientId,
-            name: _name,
-            age: _age,
-            bloodType: _bloodType,
-            requiredOrgan: _requiredOrgan,
-            urgency: _urgency,
-            contactInfo: _contactInfo
-        });
-        
-        emit RecipientRegistered(_recipientId, _name);
-        return true;
+
+    function removeDonor(string memory _donorId) public {
+        bool found=false;
+        uint index;
+        for(index=0;index<donorIDs.length;index++){
+            if(keccak256(abi.encodePacked(donorIDs[index]))==keccak256(abi.encodePacked(_donorId))){
+                found=true;
+                break;
+            }
+        }
+        require(found,"Donor ID not found");
+        for(uint i=index;i<donorIDs.length-1;i++){
+            donorIDs[i]=donorIDs[i+1];
+        }
+        donorIDs.pop();
     }
-    
+
+    function getCurrentAvailableRecipientID() public view returns(uint) {
+        return CurrentAvailableRecipientID;
+    }
+
+    function registerRecipient(string memory recipientId,string memory cid) public {
+        recipientCIDs[recipientId]=cid;
+        recipientIDs.push(recipientId);
+        CurrentAvailableRecipientID++;
+    }
+
+    function getRecipientIDs() public view returns (string[] memory){
+        return recipientIDs;
+    }
+
+    function getRecipientCID(string memory _recipientId) public view returns (string memory) {
+        return recipientCIDs[_recipientId];
+    }
+
+    function removeRecipient(string memory _recipientId) public {
+        bool found=false;
+        uint index;
+        for(index=0;index<recipientIDs.length;index++){
+            if(keccak256(abi.encodePacked(recipientIDs[index]))==keccak256(abi.encodePacked(_recipientId))){
+                found=true;
+                break;
+            }
+        }
+        require(found,"Recipient ID not found");
+        for(uint i=index;i<recipientIDs.length-1;i++){
+            recipientIDs[i]=recipientIDs[i+1];
+        }
+        recipientIDs.pop();
+    }
+
+    function getCurrentAvailableMatchedID() public view returns(uint) {
+        return CurrentAvailableMatchedID;
+    }
+
     function createMatch(
         string memory _recordId,
         string memory _donorId,
@@ -130,15 +147,8 @@ contract OrganDonationContract {
         
         matchedRecords.push(newRecord);
         emit MatchCreated(_recordId, _donorId, _recipientId, _organ, _matchDate);
+        CurrentAvailableMatchedID++;
         return true;
-    }
-    
-    
-    function getRecipient(string memory _recipientId) public view returns (Recipient memory) {
-        return recipients[_recipientId];
-    }
-    function matchedRecordsCount() public view returns (uint) {
-        return matchedRecords.length;
     }
     
     function getMatchedRecords() public view returns (MatchedRecord[] memory) {

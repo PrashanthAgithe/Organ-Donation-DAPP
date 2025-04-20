@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect,useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,12 +17,25 @@ import {
   AlertDialogAction,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { runMatching, uploadRecipientData } from "@/main";
+import { contractProvider, contractSigner } from "@/contract";
 
 const RecipientRegistration = () => {
   const navigate = useNavigate();
   const [showDialog, setShowDialog] = useState(false);
+
+  const [nextID,setnextID] = useState("");
+  const [isloading,setisloading] = useState(false);
+
+  useEffect(()=>{
+    async function getnextID(){
+      const id = await contractProvider.getCurrentAvailableRecipientID();
+      setnextID("R" + String(Number(id)));
+    }
+    getnextID();
+  },[]);
+
   const [formData, setFormData] = useState({
-    recipientId: "",
     name: "",
     age: "",
     bloodType: "",
@@ -37,8 +50,20 @@ const RecipientRegistration = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFinalSubmit = () => {
-    console.log("Recipient Data:", formData);
+  const handleFinalSubmit = async () => {
+    setisloading(true);
+    // console.log("Form Data:", formData);
+
+    let recipientdata = {
+      ...formData,
+      recipientId:nextID,
+    };
+    // console.log("Recipient Data:", recipientdata);
+
+    const cid = await uploadRecipientData(recipientdata);
+    console.log("cid:", cid);
+    const tx = await contractSigner.registerRecipient(recipientdata.recipientId, cid);
+    await tx.wait();
 
     toast('Registration Successful', {
       style: {
@@ -51,9 +76,11 @@ const RecipientRegistration = () => {
       duration: 3000,
     });
 
+    setisloading(false);
     setTimeout(() => {
       navigate("/");
-    }, 2000);
+    }, 300);
+    runMatching();
   };
 
   const handleFormSubmit = (e) => {
@@ -67,10 +94,6 @@ const RecipientRegistration = () => {
         <h2 className="text-2xl font-bold text-center mb-4">Recipient Registration</h2>
 
         <form onSubmit={handleFormSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="recipientId" className="my-3">Recipient ID</Label>
-            <Input type="text" name="recipientId" value={formData.recipientId} onChange={handleChange} required />
-          </div>
 
           <div>
             <Label htmlFor="name" className="my-3">Name</Label>
@@ -122,7 +145,13 @@ const RecipientRegistration = () => {
             <Input type="text" name="contactInfo" value={formData.contactInfo} onChange={handleChange} required />
           </div>
 
-          <Button type="submit" className="w-full bg-blue-600 text-white py-2">Register Recipient</Button>
+          <Button
+            type="submit"
+            disabled={isloading}
+            className={`w-full ${isloading ? "bg-blue-200 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"} text-white py-2`}
+          >
+            {isloading ? "Registering..." : "Register Recipient"}
+          </Button>
         </form>
       </div>
 
@@ -131,9 +160,9 @@ const RecipientRegistration = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Registration</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription asChild>
               <div className="text-sm text-left space-y-1">
-                <p><strong>ID:</strong> {formData.recipientId}</p>
+                <p><strong>ID:</strong> {nextID}</p>
                 <p><strong>Name:</strong> {formData.name}</p>
                 <p><strong>Age:</strong> {formData.age}</p>
                 <p><strong>Blood Type:</strong> {formData.bloodType}</p>
