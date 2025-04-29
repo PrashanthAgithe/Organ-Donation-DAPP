@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
+pragma solidity ^0.8.19;
 
 contract OrganDonationContract {
     // Struct for donor details
@@ -60,10 +60,13 @@ contract OrganDonationContract {
         return CurrentAvailableDonorID;
     }
 
-    function registerDonor(string memory donorId,string memory cid) public {
-        donorCIDs[donorId]=cid;
-        donorIDs.push(donorId);
-        CurrentAvailableDonorID++;
+    function registerDonor(string memory donorId, string memory cid) public {
+        bool exists = bytes(donorCIDs[donorId]).length > 0;
+        donorCIDs[donorId] = cid;
+        if (!exists) {
+            donorIDs.push(donorId);
+            CurrentAvailableDonorID++;
+        }
     }
 
     function getDonorIDs() public view returns (string[] memory){

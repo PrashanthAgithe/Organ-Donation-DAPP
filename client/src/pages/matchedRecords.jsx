@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { getAllMatchedRecords } from "../main"
+import { getAllMatchedRecords, transplant } from "../main"
 import {
   Table,
   TableBody,
@@ -46,6 +46,7 @@ export default function MatchedRecordsTable() {
                 <TableHead>Organ</TableHead>
                 <TableHead>Match Date</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -63,6 +64,15 @@ export default function MatchedRecordsTable() {
                       {record.status}
                     </Badge>
                   </TableCell>
+                  <TableCell>
+                    <button
+                      className="px-3 py-1 bg-green-600 text-white rounded disabled:opacity-50"
+                      disabled={record.status !== "matched"}
+                      onClick={() => transplant(record)}
+                    >
+                      Transplant
+                    </button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -72,4 +82,3 @@ export default function MatchedRecordsTable() {
     </div>
   )
 }
-

@@ -40,7 +40,7 @@ export const insertMatchedRecord = async (record) => {
   }
 };
 
-export const getAllMatchedRecords = async () => {
+export const getAllTransplantedRecords = async () => {
   try {
     const tx = await contractProvider.getMatchedRecords();
     const MatchedRecords = tx.map(record => ({
@@ -175,70 +175,150 @@ export const retrieveRecipientData = async (cid) => {
 };
 
 import { toast } from "sonner";
-export const runMatching = async () => {
-  try {
-    const donorIDs     = await getAlldonorIDs();
-    const recipientIDs = await getAllrecipientIDs(); 
-    let count=0;
-    const existing = await getAllMatchedRecords();
-    for (const donorId of donorIDs) {
-      // fetch donor CID & data
-      const donorCID = await contractProvider.getDonorCID(donorId);
-      const donor    = await retrieveDonorData(donorCID);
 
-      // only consider Deceased donors
-      if (donor.status === "alive") continue;
+export const getAllMatchedRecords = async () => {
+  const donorIDs     = await getAlldonorIDs();
+  const recipientIDs = await getAllrecipientIDs();
+  // const existing     = await getAllTransplantedRecords();
+  const matches      = [];
 
-      for (const recipientId of recipientIDs) {
-        // fetch recipient CID & data
-        const recipientCID = await contractProvider.getRecipientCID(recipientId);
-        const recipient    = await retrieveRecipientData(recipientCID);
+  for (const donorId of donorIDs) {
+    const donorCID = await contractProvider.getDonorCID(donorId);
+    const donor    = await retrieveDonorData(donorCID);
+    if (donor.status === 'alive') continue;
 
-        // simple matching logic
-        const wants = recipient.requiredOrgan;
-        const hasOrgan = donor.organsAvailable.includes(wants);
-        const sameBlood = donor.bloodType === recipient.bloodType;
+    for (const recipientId of recipientIDs) {
+      const recipientCID = await contractProvider.getRecipientCID(recipientId);
+      const recipient    = await retrieveRecipientData(recipientCID);
+      const wants      = recipient.requiredOrgan;
+      const hasOrgan = donor.organsAvailable.includes(wants);
+      const sameBlood= donor.bloodType === recipient.bloodType;
+      if (!hasOrgan || !sameBlood) continue;
 
-        if (hasOrgan && sameBlood) {
-          // checking whether smae matching already exists
-          const already = existing.some(r =>
-            r.donorId === donorId && r.recipientId === recipientId && r.organ === wants
-          );
+      // const already = existing.some(r =>
+      //   r.donorId     === donorId &&
+      //   r.recipientId === recipientId &&
+      //   r.organ       === wants
+      // );
+      // if (already) continue;
 
-          if (already) continue;
-
-          // creating record to insert
-          const matchDate = Math.floor(Date.now() / 1000);
-          const nextID=await contractProvider.getCurrentAvailableMatchedID();
-          const recordId  = "M"+String(Number(nextID));
-          const status    = "matched";
-
-          await insertMatchedRecord({
-            recordId,
-            donorId,
-            recipientId,
-            organ: wants,
-            matchDate,
-            status
-          });
-          count++;
-        }
-      }
+      const matchDate = Math.floor(Date.now()/1000);
+      const nextID    = matches.length;
+      const recordId  = `M${nextID.toString()}`;
+      matches.push({
+        recordId,
+        donorId,
+        recipientId,
+        organ: wants,
+        matchDate: matchDate.toString(),
+        status: 'matched'
+      });
     }
-    toast(count+' Matched records Updated', {
-      style: {
-        backgroundColor: '#4CAF50',
-        color: 'white',
-        fontSize: '16px',
-        borderRadius: '8px',
-        padding: '12px 24px',
-      },
-      duration: 3000,
-    });
-  } catch (error) {
-    console.error("❌ runMatching failed:", error);
   }
-}
+
+  return matches;
+};
+
+// export const runMatching = async () => {
+//   try {
+//     const donorIDs     = await getAlldonorIDs();
+//     const recipientIDs = await getAllrecipientIDs(); 
+//     let count=0;
+//     const existing = await getAllMatchedRecords();
+//     for (const donorId of donorIDs) {
+//       // fetch donor CID & data
+//       const donorCID = await contractProvider.getDonorCID(donorId);
+//       const donor    = await retrieveDonorData(donorCID);
+
+//       // only consider Deceased donors
+//       if (donor.status === "alive") continue;
+
+//       for (const recipientId of recipientIDs) {
+//         // fetch recipient CID & data
+//         const recipientCID = await contractProvider.getRecipientCID(recipientId);
+//         const recipient    = await retrieveRecipientData(recipientCID);
+
+//         // simple matching logic
+//         const wants = recipient.requiredOrgan;
+//         const hasOrgan = donor.organsAvailable.includes(wants);
+//         const sameBlood = donor.bloodType === recipient.bloodType;
+
+//         if (hasOrgan && sameBlood) {
+//           // checking whether smae matching already exists
+//           const already = existing.some(r =>
+//             r.donorId === donorId && r.recipientId === recipientId && r.organ === wants
+//           );
+
+//           if (already) continue;
+
+//           // creating record to insert
+//           const matchDate = Math.floor(Date.now() / 1000);
+//           const nextID=await contractProvider.getCurrentAvailableMatchedID();
+//           const recordId  = "M"+String(Number(nextID));
+//           const status    = "matched";
+
+//           await insertMatchedRecord({
+//             recordId,
+//             donorId,
+//             recipientId,
+//             organ: wants,
+//             matchDate,
+//             status
+//           });
+//           count++;
+//         }
+//       }
+//     }
+//     toast(count+' Matched records Updated', {
+//       style: {
+//         backgroundColor: '#4CAF50',
+//         color: 'white',
+//         fontSize: '16px',
+//         borderRadius: '8px',
+//         padding: '12px 24px',
+//       },
+//       duration: 3000,
+//     });
+//   } catch (error) {
+//     console.error("runMatching failed:", error);
+//   }
+// }
+
+export const transplant = async (record) => {
+  try {
+    // 1. Record the transplant on-chain
+    const nextID = await contractProvider.getCurrentAvailableMatchedID();
+    await insertMatchedRecord({
+      recordId:    `T${nextID}`,
+      donorId:     record.donorId,
+      recipientId: record.recipientId,
+      organ:       record.organ,
+      matchDate:   Math.floor(Date.now() / 1000),
+      status:      "transplanted"
+    });
+
+    // 2. Remove the recipient from the pool
+    const tx1=await contractSigner.removeRecipient(record.recipientId);
+    await tx1.wait();
+    // 3. Fetch, update, re-upload and re-register the donor
+    const donorCID = await contractProvider.getDonorCID(record.donorId);
+    const donor    = await retrieveDonorData(donorCID);
+    const updated  = {
+      ...donor,
+      organsAvailable: donor.organsAvailable.filter(o => o !== record.organ)
+    };
+    const newCid = await uploadDonorData(updated);
+
+    const tx2 = await contractSigner.registerDonor(record.donorId, newCid);
+    await tx2.wait();
+
+    toast.success(`Transplanted ${record.organ}`, { duration: 3000 });
+  } catch (err) {
+    console.error("transplant failed:", err);
+    toast.error("Transplant failed", { duration: 3000 });
+  }
+};
+
 
 
 // export const deleteData = async (cid) => {
@@ -249,3 +329,10 @@ export const runMatching = async () => {
 //     console.error(`Error unpinning CID ${cid}:`, error);
 //   }
 // };
+export const getDonorCID = async (id)=>{
+  const donorcid =await contractProvider.getDonorCID(id);
+  console.log(donorcid);
+}
+export const setDonorCID = async (id,cid)=>{
+  
+}

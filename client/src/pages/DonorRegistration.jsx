@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { contractProvider, contractSigner } from "@/contract";
-import { runMatching, uploadDonorData } from "@/main";
+import { uploadDonorData } from "@/main";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -86,7 +86,7 @@ const DonorRegistration = () => {
     setTimeout(() => {
       navigate("/");
     }, 300);
-    runMatching();
+    // runMatching();
   };
 
   return (

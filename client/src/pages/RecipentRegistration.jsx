@@ -17,7 +17,7 @@ import {
   AlertDialogAction,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { runMatching, uploadRecipientData } from "@/main";
+import { uploadRecipientData } from "@/main";
 import { contractProvider, contractSigner } from "@/contract";
 
 const RecipientRegistration = () => {
@@ -80,7 +80,7 @@ const RecipientRegistration = () => {
     setTimeout(() => {
       navigate("/");
     }, 300);
-    runMatching();
+    // runMatching();
   };
 
   const handleFormSubmit = (e) => {
