@@ -15,8 +15,8 @@ import { useNavigate } from "react-router-dom"
 export default function MatchedRecordsTable() {
   const [records, setRecords] = useState([])
   const [loading, setLoading] = useState(true)
-  const [transplanting, setTransplanting] = useState(false) // New state to track transplant operation
-  const navigate=useNavigate()
+  const [transplantingId, setTransplantingId] = useState(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     async function fetchRecords() {
@@ -26,21 +26,22 @@ export default function MatchedRecordsTable() {
     }
 
     fetchRecords()
-  }, [transplanting])
+  }, [transplantingId])
 
   const handleTransplant = async (record) => {
-    setTransplanting(true) // Start transplant operation
+    setTransplantingId(record.recordId)
     try {
       await transplant(record)
-      navigate('/getTransplantedRecords')
+      // navigate('/getTransplantedRecords')
     } catch (error) {
       console.error("Error during transplant operation:", error)
     } finally {
-      setTransplanting(false) // End transplant operation
+      setTransplantingId(null)
     }
   }
 
-  if (loading) return <p className="text-center mt-10 text-lg">Loading matched records...</p>
+  if (loading)
+    return <p className="text-center mt-10 text-lg">Loading matched records...</p>
 
   if (records.length === 0)
     return <p className="text-center mt-10 text-lg text-muted-foreground">No matched records found.</p>
@@ -82,10 +83,10 @@ export default function MatchedRecordsTable() {
                   <TableCell>
                     <button
                       className="px-3 py-1 bg-green-600 text-white rounded disabled:opacity-50 cursor-pointer"
-                      disabled={record.status !== "matched" || transplanting}
+                      disabled={record.status !== "matched" || transplantingId !== null}
                       onClick={() => handleTransplant(record)}
                     >
-                      {transplanting ? "Updating..." : "Transplant"}
+                      {transplantingId === record.recordId ? "Updating..." : "Transplant"}
                     </button>
                   </TableCell>
                 </TableRow>

@@ -117,7 +117,7 @@ const DonorRegistration = () => {
                 <Button
                   key={organ}
                   type="button"
-                  className={`px-4 py-2 ${formData.organsAvailable.includes(organ) ? "bg-blue-600 text-white" : "bg-black hover:bg-gray-700"}`}
+                  className={`px-4 py-2 ${formData.organsAvailable.includes(organ) ? "bg-blue-600 text-white" : "bg-gray-300 hover:bg-gray-700"}`}
                   onClick={() => handleOrganChange(organ)}
                 >
                   {organ}

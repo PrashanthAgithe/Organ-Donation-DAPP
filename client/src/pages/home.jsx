@@ -30,6 +30,7 @@ import {
   insertMatchedRecord,
   uploadDonorData,
   retrieveDonorData,
+  updateDonorStatus
 } from "../main";
 
 import { Input } from "@/components/ui/input";
@@ -50,30 +51,31 @@ const LandingPage = () => {
     }
   };
 
-  // // handle status submission and update
-  // const handleSubmitStatus = async () => {
-  //   if (!donorId || !status) {
-  //     toast.error("Please enter both Donor ID and status");
-  //     return;
-  //   }
+  // handle status submission and update
+  const handleSubmitStatus = async () => {
+    if (!donorId || !status) {
+      toast.error("Please enter both Donor ID and status");
+      return;
+    }
 
-  //   try {
-  //     // Show loading toast while transaction is pending
-  //     const toastId = toast.loading("Updating donor status...");
+    try {
+      // Show loading toast while transaction is pending
+      console.log("came");
+      const toastId = toast.loading("Updating donor status...");
 
-  //     await updateDonorStatus(donorId, status); // awaits successful TX
-  //     toast.success(`Donor ${donorId} status updated to ${status}`, {
-  //       id: toastId,
-  //     });
+      await updateDonorStatus(donorId, status); // awaits successful TX
+      toast.success(`Donor ${donorId} status updated to ${status}`, {
+        id: toastId,
+      });
 
-  //     // Clear form after successful update
-  //     setDonorId("");
-  //     setStatus("");
-  //   } catch (error) {
-  //     console.error("Failed to update donor status:", error);
-  //     toast.error("Failed to update status. Check console for details.");
-  //   }
-  // };
+      // Clear form after successful update
+      setDonorId("");
+      setStatus("");
+    } catch (error) {
+      console.error("Failed to update donor status:", error);
+      toast.error("Failed to update status. Check console for details.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900">
@@ -106,7 +108,7 @@ const LandingPage = () => {
             onClick={() => navigate('/getTransplantedRecords')}
             className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
           >
-            Get All Transplanted Records
+            View Transplanted Records
           </Button>
 
           {/* Update Donor Status Dialog */}
@@ -144,7 +146,7 @@ const LandingPage = () => {
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="live">Live</SelectItem>
+                    <SelectItem value="alive">Alive</SelectItem>
                     <SelectItem value="deceased">Deceased</SelectItem>
                   </SelectContent>
                 </Select>
@@ -155,7 +157,7 @@ const LandingPage = () => {
                   Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction
-                  // onClick={handleSubmitStatus}
+                  onClick={handleSubmitStatus}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300"
                 >
                   Submit

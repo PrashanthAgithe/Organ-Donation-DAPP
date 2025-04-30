@@ -61,7 +61,7 @@ export default function TransplantedRecordsTable() {
                     {format(new Date(parseInt(record.matchDate) * 1000), "PPPpp")}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="capitalize">
+                    <Badge variant="outline" className="capitalize bg-green-300">
                       {record.status}
                     </Badge>
                   </TableCell>
