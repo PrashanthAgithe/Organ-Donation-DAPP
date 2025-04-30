@@ -333,6 +333,27 @@ export const getDonorCID = async (id)=>{
   const donorcid =await contractProvider.getDonorCID(id);
   console.log(donorcid);
 }
-export const setDonorCID = async (id,cid)=>{
-  
-}
+
+// // Update Donor Status
+// export const updateDonorStatus = async (donorId, status) => {
+//   try {
+//     // Call the updateDonorStatus function on the contract
+//     const tx = await contractSigner.updateDonorStatus(donorId, status);
+//     await tx.wait(); // Wait for the transaction to be mined
+//     console.log(`Donor status updated to ${status} for Donor ID: ${donorId}`);
+//   } catch (error) {
+//     console.error("Error in updating donor status on Blockchain:", error);
+//   }
+// };
+
+// Set Donor CID
+// export const setDonorCID = async (donorId, cid) => {
+//   try {
+//     // Register the donor with the given CID
+//     const tx = await contractSigner.registerDonor(donorId, cid);
+//     await tx.wait(); // Wait for the transaction to be mined
+//     console.log(`CID updated for Donor ID: ${donorId} to CID: ${cid}`);
+//   } catch (error) {
+//     console.error("Error in setting donor CID on Blockchain:", error);
+//   }
+// };

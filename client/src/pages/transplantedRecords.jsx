@@ -1,5 +1,7 @@
+import { format } from "date-fns"
+import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
-import { getAllMatchedRecords, transplant } from "../main"
+import { getAllTransplantedRecords } from "../main" // Make sure you have a function to fetch transplanted records
 import {
   Table,
   TableBody,
@@ -9,59 +11,43 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { format } from "date-fns"
-import { useNavigate } from "react-router-dom"
 
-export default function MatchedRecordsTable() {
+export default function TransplantedRecordsTable() {
   const [records, setRecords] = useState([])
   const [loading, setLoading] = useState(true)
-  const [transplanting, setTransplanting] = useState(false) // New state to track transplant operation
-  const navigate=useNavigate()
+  const navigate = useNavigate()
 
   useEffect(() => {
     async function fetchRecords() {
-      const data = await getAllMatchedRecords()
+      const data = await getAllTransplantedRecords() 
       setRecords(data)
       setLoading(false)
     }
 
     fetchRecords()
-  }, [transplanting])
+  }, [])
 
-  const handleTransplant = async (record) => {
-    setTransplanting(true) // Start transplant operation
-    try {
-      await transplant(record)
-      navigate('/getTransplantedRecords')
-    } catch (error) {
-      console.error("Error during transplant operation:", error)
-    } finally {
-      setTransplanting(false) // End transplant operation
-    }
-  }
-
-  if (loading) return <p className="text-center mt-10 text-lg">Loading matched records...</p>
+  if (loading) return <p className="text-center mt-10 text-lg">Loading transplanted records...</p>
 
   if (records.length === 0)
-    return <p className="text-center mt-10 text-lg text-muted-foreground">No matched records found.</p>
+    return <p className="text-center mt-10 text-lg text-muted-foreground">No transplanted records found.</p>
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 py-10 px-4">
       <div className="max-w-6xl mx-auto bg-white shadow-xl rounded-xl p-6">
         <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
-          Matched Organ Records
+          Transplanted Organ Records
         </h1>
         <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Match ID</TableHead>
+                <TableHead>Record ID</TableHead>
                 <TableHead>Donor ID</TableHead>
                 <TableHead>Recipient ID</TableHead>
                 <TableHead>Organ</TableHead>
                 <TableHead>Match Date</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -78,15 +64,6 @@ export default function MatchedRecordsTable() {
                     <Badge variant="outline" className="capitalize">
                       {record.status}
                     </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <button
-                      className="px-3 py-1 bg-green-600 text-white rounded disabled:opacity-50 cursor-pointer"
-                      disabled={record.status !== "matched" || transplanting}
-                      onClick={() => handleTransplant(record)}
-                    >
-                      {transplanting ? "Updating..." : "Transplant"}
-                    </button>
                   </TableCell>
                 </TableRow>
               ))}

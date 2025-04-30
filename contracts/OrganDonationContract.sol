@@ -161,4 +161,18 @@ contract OrganDonationContract {
     function getMessage() public pure returns (string memory) {
         return "Blockchain Connected successfully!";
     }
+
+    //event DonorStatusUpdated(string donorId, string status);
+
+    //function updateDonorStatus(string memory _donorId, string memory _status) public returns (bool) {
+    // Ensure the donor exists
+    require(bytes(donors[_donorId].donorId).length > 0, "Donor ID not found");
+
+    // Update the donor's status
+    //donors[_donorId].status = _status;
+
+    //emit DonorStatusUpdated(_donorId, _status);
+    //return true;
+    //}
+
 }

@@ -1,25 +1,79 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaEthereum } from "react-icons/fa";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FaEthereum } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import {
+  getAlldonorIDs,
+  getAllMatchedRecords,
+  getAllrecipientIDs,
+  getAllTransplantedRecords,
+  getDonorCID,
+  insertMatchedRecord,
+  uploadDonorData,
+  retrieveDonorData,
+} from "../main";
 
-import {contractProvider,contractSigner} from "../contract";
-import {getAlldonorIDs, getAllMatchedRecords, getAllrecipientIDs, getAllTransplantedRecords, getDonorCID, insertMatchedRecord} from "../main"
-import { uploadDonorData,retrieveDonorData } from "../main";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+
 const LandingPage = () => {
+  const navigate = useNavigate();
+  const [status, setStatus] = useState("live");
+  const [donorId, setDonorId] = useState(""); // State to track donor ID
 
-  const navigate=useNavigate();
-
-  const check= async ()=>{
-    try{
-      const msg= await contractProvider.getMessage();
+  const check = async () => {
+    try {
+      const msg = await contractProvider.getMessage();
       console.log(msg);
-    }catch(error){
-      console.log("Error in getting message from Blockchain:",error);
+    } catch (error) {
+      console.log("Error in getting message from Blockchain:", error);
     }
-  }
-  
+  };
+
+  // // handle status submission and update
+  // const handleSubmitStatus = async () => {
+  //   if (!donorId || !status) {
+  //     toast.error("Please enter both Donor ID and status");
+  //     return;
+  //   }
+
+  //   try {
+  //     // Show loading toast while transaction is pending
+  //     const toastId = toast.loading("Updating donor status...");
+
+  //     await updateDonorStatus(donorId, status); // awaits successful TX
+  //     toast.success(`Donor ${donorId} status updated to ${status}`, {
+  //       id: toastId,
+  //     });
+
+  //     // Clear form after successful update
+  //     setDonorId("");
+  //     setStatus("");
+  //   } catch (error) {
+  //     console.error("Failed to update donor status:", error);
+  //     toast.error("Failed to update status. Check console for details.");
+  //   }
+  // };
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900">
@@ -29,37 +83,87 @@ const LandingPage = () => {
         <p className="text-lg max-w-2xl">
           A secure, transparent, and tamper-proof organ donation system powered by blockchain.
         </p>
-        <div className="flex gap-4 mt-6">
-          <Button 
-          onClick={()=>navigate('/donor-registration')}
-          className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
+        <div className="flex flex-wrap justify-center align-center gap-4 mt-6">
+          <Button
+            onClick={() => navigate('/donor-registration')}
+            className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
           >
             Donor Registration
           </Button>
-          <Button 
-          onClick={()=>navigate('/recipient-registration')}
-          className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
+          <Button
+            onClick={() => navigate('/recipient-registration')}
+            className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
           >
             Recipient Registration
           </Button>
-          <Button 
-          onClick={()=>navigate('/getMatchedRecords')}
-          className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
+          <Button
+            onClick={() => navigate('/getMatchedRecords')}
+            className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
           >
             Get All Matched Records
           </Button>
-          <Button 
-          onClick={getAllTransplantedRecords}
-          className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
+          <Button
+            onClick={() => navigate('/getTransplantedRecords')}
+            className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
           >
             Get All Transplanted Records
           </Button>
-          <Button 
-          onClick={()=>getDonorCID('D0')}
-          className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
-          >
-            get donor Cid
-          </Button>
+
+          {/* Update Donor Status Dialog */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md transition-all duration-300">
+                Update Donor Status
+              </Button>
+            </AlertDialogTrigger>
+
+            <AlertDialogContent className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
+              <AlertDialogHeader className="text-center mb-6">
+                <AlertDialogTitle className="text-2xl font-semibold text-gray-800">
+                  Update Donor Status
+                </AlertDialogTitle>
+              </AlertDialogHeader>
+
+              <div className="mb-4">
+                <Label className="block text-sm font-medium text-gray-700">Donor Id</Label>
+                <Input
+                  value={donorId}
+                  onChange={(e) => setDonorId(e.target.value)} // Handle donor ID input change
+                  className="mt-2 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="mb-6">
+                <Label className="block text-sm font-medium text-gray-700">Status</Label>
+                <Select
+                  defaultValue="live"
+                  onValueChange={(value) => setStatus(value)}
+                  className="mt-2 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="live">Live</SelectItem>
+                    <SelectItem value="deceased">Deceased</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <AlertDialogFooter className="flex justify-between">
+                <AlertDialogCancel className="text-sm text-gray-600 hover:text-gray-800">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  // onClick={handleSubmitStatus}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300"
+                >
+                  Submit
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
         </div>
       </header>
 
