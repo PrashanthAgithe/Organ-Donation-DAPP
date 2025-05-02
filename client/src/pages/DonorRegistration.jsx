@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { contractProvider, contractSigner } from "@/contract";
-import { uploadDonorData } from "@/main";
+import { uploadDataToPinata } from "@/main";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -66,22 +66,28 @@ const DonorRegistration = () => {
       donorId:nextID,
     };
     // console.log("Donor Data:", donordata);
-
-    const cid = await uploadDonorData(donordata);
-    // console.log("cid:", cid);
-    const tx = await contractSigner.registerDonor(donordata.donorId, cid);
-    await tx.wait();
-
-    toast('Registration Successful', {
+    const toastId = toast.loading('Registering...', {
+      position: 'bottom-right',
       style: {
-        backgroundColor: '#4CAF50',
-        color: 'white',
+        backgroundColor: 'white',
+        color: 'black',
         fontSize: '16px',
         borderRadius: '8px',
         padding: '12px 24px',
       },
-      duration: 3000,
     });
+    try{
+      const cid = await uploadDataToPinata(donordata);
+      // console.log("cid:", cid);
+      const tx = await contractSigner.registerDonor(donordata.donorId, cid);
+      await tx.wait();
+
+      toast.success('Registration Successful', { id: toastId });
+    }catch(error){
+      console.error('Registration failed:', error);
+      toast.error('Registration Failed', { id: toastId });
+    }
+    
     setisloading(false);
     setTimeout(() => {
       navigate("/");

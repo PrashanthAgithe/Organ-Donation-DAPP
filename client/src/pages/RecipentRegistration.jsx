@@ -17,7 +17,7 @@ import {
   AlertDialogAction,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { uploadRecipientData } from "@/main";
+import { uploadDataToPinata } from "@/main";
 import { contractProvider, contractSigner } from "@/contract";
 
 const RecipientRegistration = () => {
@@ -59,22 +59,27 @@ const RecipientRegistration = () => {
       recipientId:nextID,
     };
     // console.log("Recipient Data:", recipientdata);
-
-    const cid = await uploadRecipientData(recipientdata);
-    console.log("cid:", cid);
-    const tx = await contractSigner.registerRecipient(recipientdata.recipientId, cid);
-    await tx.wait();
-
-    toast('Registration Successful', {
+    const toastId = toast.loading('Registering...', {
+      position: 'bottom-right',
       style: {
-        backgroundColor: '#4CAF50',
-        color: 'white',
+        backgroundColor: 'white',
+        color: 'black',
         fontSize: '16px',
         borderRadius: '8px',
         padding: '12px 24px',
       },
-      duration: 3000,
     });
+    try{
+      const cid = await uploadDataToPinata(recipientdata);
+      // console.log("cid:", cid);
+      const tx = await contractSigner.registerRecipient(recipientdata.recipientId, cid);
+      await tx.wait();
+
+      toast.success('Registration Successful', { id: toastId });
+    }catch(error){
+      console.error('Registration failed:', error);
+      toast.error('Registration Failed', { id: toastId });
+    }
 
     setisloading(false);
     setTimeout(() => {

@@ -11,6 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { format } from "date-fns"
 import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
 
 export default function MatchedRecordsTable() {
   const [records, setRecords] = useState([])
@@ -30,11 +31,23 @@ export default function MatchedRecordsTable() {
 
   const handleTransplant = async (record) => {
     setTransplantingId(record.recordId)
+    const toastId = toast.loading('Transplanting...', {
+      position: 'bottom-right',
+      style: {
+        backgroundColor: 'white',
+        color: 'black',
+        fontSize: '16px',
+        borderRadius: '8px',
+        padding: '12px 24px',
+      },
+    });
     try {
       await transplant(record)
       // navigate('/getTransplantedRecords')
+      toast.success(`Transplanted ${record.organ}`, { id: toastId });
     } catch (error) {
       console.error("Error during transplant operation:", error)
+      toast.error("Transplant failed", { id: toastId });
     } finally {
       setTransplantingId(null)
     }

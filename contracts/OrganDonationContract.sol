@@ -2,41 +2,15 @@
 pragma solidity ^0.8.19;
 
 contract OrganDonationContract {
-    // Struct for donor details
-    struct Donor {
-        string donorId;
-        string name;
-        uint8 age;
-        string bloodType;
-        string[] organsAvailable;
-        string contactInfo;
-        string status; // e.g., "alive", "deceased"
-    }
-    
-    // Struct for recipient details
-    struct Recipient {
-        string recipientId;
-        string name;
-        uint8 age;
-        string bloodType;
-        string requiredOrgan;
-        string urgency; // e.g., "high", "medium", "low"
-        string contactInfo;
-    }
-    
-    // Struct for matched records between donor and recipient
+    //struct to stored matched records
     struct MatchedRecord {
         string recordId;
         string donorId;
         string recipientId;
         string organ;
-        uint matchDate; // Unix timestamp
-        string status;  // e.g., "pending", "matched", "completed"
+        uint matchDate;
+        string status;
     }
-    
-    // Mappings for storing donors and recipients by their IDs
-    mapping(string => Donor) private donors;
-    mapping(string => Recipient) private recipients;
 
     uint private CurrentAvailableDonorID=0;
     uint private CurrentAvailableRecipientID=0;
@@ -47,16 +21,14 @@ contract OrganDonationContract {
     
     string[] private donorIDs;
     string[] private recipientIDs;
-
-    // Array to store matched records
     MatchedRecord[] private matchedRecords;
     
-    // Events to log activities
+    //events to log activities
     event DonorRegistered(string donorId, string name);
     event RecipientRegistered(string recipientId, string name);
     event MatchCreated(string recordId, string donorId, string recipientId, string organ, uint matchDate);
     
-    function getCurrentAvailableDonorID() public view returns(uint) {
+    function getCurrentAvailableDonorID() public view returns(uint){
         return CurrentAvailableDonorID;
     }
 
@@ -73,7 +45,7 @@ contract OrganDonationContract {
         return donorIDs;
     }
 
-    function getDonorCID(string memory _donorId) public view returns (string memory) {
+    function getDonorCID(string memory _donorId) public view returns (string memory){
         return donorCIDs[_donorId];
     }
 
@@ -93,7 +65,7 @@ contract OrganDonationContract {
         donorIDs.pop();
     }
 
-    function getCurrentAvailableRecipientID() public view returns(uint) {
+    function getCurrentAvailableRecipientID() public view returns(uint){
         return CurrentAvailableRecipientID;
     }
 
@@ -107,7 +79,7 @@ contract OrganDonationContract {
         return recipientIDs;
     }
 
-    function getRecipientCID(string memory _recipientId) public view returns (string memory) {
+    function getRecipientCID(string memory _recipientId) public view returns (string memory){
         return recipientCIDs[_recipientId];
     }
 
@@ -127,7 +99,7 @@ contract OrganDonationContract {
         recipientIDs.pop();
     }
 
-    function getCurrentAvailableMatchedID() public view returns(uint) {
+    function getCurrentAvailableMatchedID() public view returns(uint){
         return CurrentAvailableMatchedID;
     }
 
@@ -138,7 +110,7 @@ contract OrganDonationContract {
         string memory _organ,
         uint _matchDate,
         string memory _status
-    ) public returns (bool) {
+    ) public returns(bool){
         MatchedRecord memory newRecord = MatchedRecord({
             recordId: _recordId,
             donorId: _donorId,
@@ -158,7 +130,7 @@ contract OrganDonationContract {
         return matchedRecords;
     }
     
-    function getMessage() public pure returns (string memory) {
+    function getMessage() public pure returns (string memory){
         return "Blockchain Connected successfully!";
     }
 

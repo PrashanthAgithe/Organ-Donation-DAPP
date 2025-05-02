@@ -26,10 +26,7 @@ import {
   getAllMatchedRecords,
   getAllrecipientIDs,
   getAllTransplantedRecords,
-  getDonorCID,
   insertMatchedRecord,
-  uploadDonorData,
-  retrieveDonorData,
   updateDonorStatus
 } from "../main";
 
