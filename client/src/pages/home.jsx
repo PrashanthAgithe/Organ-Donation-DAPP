@@ -26,13 +26,14 @@ import {
   getAllMatchedRecords,
   getAllrecipientIDs,
   getAllTransplantedRecords,
-  insertMatchedRecord,
+  insertTransplantedRecord,
   updateDonorStatus
 } from "../main";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { AlertDialogDescription } from "@radix-ui/react-alert-dialog";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -54,17 +55,21 @@ const LandingPage = () => {
       toast.error("Please enter both Donor ID and status");
       return;
     }
-
+    const toastId = toast.loading('Updating donor status...', {
+      position: 'bottom-right',
+      style: {
+        backgroundColor: 'white',
+        color: 'black',
+        fontSize: '16px',
+        borderRadius: '8px',
+        padding: '12px 24px',
+      },
+    });
     try {
-      // Show loading toast while transaction is pending
-      console.log("came");
-      const toastId = toast.loading("Updating donor status...");
-
-      await updateDonorStatus(donorId, status); // awaits successful TX
+      await updateDonorStatus(donorId, status);
       toast.success(`Donor ${donorId} status updated to ${status}`, {
         id: toastId,
       });
-
       // Clear form after successful update
       setDonorId("");
       setStatus("");
@@ -117,29 +122,31 @@ const LandingPage = () => {
             </AlertDialogTrigger>
 
             <AlertDialogContent className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
-              <AlertDialogHeader className="text-center mb-6">
+              <AlertDialogHeader className="text-center mb-4">
                 <AlertDialogTitle className="text-2xl font-semibold text-gray-800">
                   Update Donor Status
                 </AlertDialogTitle>
+                <AlertDialogDescription className="text-sm text-gray-600 mt-2">
+                  Enter the donor ID and select the appropriate status to update donor information.
+                </AlertDialogDescription>
               </AlertDialogHeader>
 
-              <div className="mb-4">
+              <div className="mb-3">
                 <Label className="block text-sm font-medium text-gray-700">Donor Id</Label>
                 <Input
                   value={donorId}
-                  onChange={(e) => setDonorId(e.target.value)} // Handle donor ID input change
+                  onChange={(e) => setDonorId(e.target.value)}
                   className="mt-2 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
-              <div className="mb-6">
+              <div className="mb-3">
                 <Label className="block text-sm font-medium text-gray-700">Status</Label>
                 <Select
-                  defaultValue="live"
+                  defaultValue="alive"
                   onValueChange={(value) => setStatus(value)}
-                  className="mt-2 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="mt-2 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -162,6 +169,7 @@ const LandingPage = () => {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+
 
         </div>
       </header>

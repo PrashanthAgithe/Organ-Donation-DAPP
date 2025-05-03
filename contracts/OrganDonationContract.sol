@@ -2,8 +2,8 @@
 pragma solidity ^0.8.19;
 
 contract OrganDonationContract {
-    //struct to stored matched records
-    struct MatchedRecord {
+    //struct to store Transplanted records
+    struct TransplantedRecord {
         string recordId;
         string donorId;
         string recipientId;
@@ -14,19 +14,19 @@ contract OrganDonationContract {
 
     uint private CurrentAvailableDonorID=0;
     uint private CurrentAvailableRecipientID=0;
-    uint private CurrentAvailableMatchedID=0;
+    uint private CurrentAvailableTransplantedID=0;
 
     mapping(string => string) private donorCIDs;
     mapping(string => string) private recipientCIDs;
     
     string[] private donorIDs;
     string[] private recipientIDs;
-    MatchedRecord[] private matchedRecords;
+    TransplantedRecord[] private TransplantedRecords;
     
     //events to log activities
-    event DonorRegistered(string donorId, string name);
-    event RecipientRegistered(string recipientId, string name);
-    event MatchCreated(string recordId, string donorId, string recipientId, string organ, uint matchDate);
+    event DonorRegistered(string donorId);
+    event RecipientRegistered(string recipientId);
+    event Transplanted(string recordId, string donorId, string recipientId, string organ, uint matchDate);
     
     function getCurrentAvailableDonorID() public view returns(uint){
         return CurrentAvailableDonorID;
@@ -39,6 +39,7 @@ contract OrganDonationContract {
             donorIDs.push(donorId);
             CurrentAvailableDonorID++;
         }
+        emit DonorRegistered(donorId);
     }
 
     function getDonorIDs() public view returns (string[] memory){
@@ -73,6 +74,7 @@ contract OrganDonationContract {
         recipientCIDs[recipientId]=cid;
         recipientIDs.push(recipientId);
         CurrentAvailableRecipientID++;
+        emit RecipientRegistered(recipientId);
     }
 
     function getRecipientIDs() public view returns (string[] memory){
@@ -99,19 +101,12 @@ contract OrganDonationContract {
         recipientIDs.pop();
     }
 
-    function getCurrentAvailableMatchedID() public view returns(uint){
-        return CurrentAvailableMatchedID;
+    function getCurrentAvailableTransplantedID() public view returns(uint){
+        return CurrentAvailableTransplantedID;
     }
 
-    function createMatch(
-        string memory _recordId,
-        string memory _donorId,
-        string memory _recipientId,
-        string memory _organ,
-        uint _matchDate,
-        string memory _status
-    ) public returns(bool){
-        MatchedRecord memory newRecord = MatchedRecord({
+    function createTransplant(string memory _recordId,string memory _donorId,string memory _recipientId,string memory _organ,uint _matchDate,string memory _status) public{
+        TransplantedRecord memory newRecord = TransplantedRecord({
             recordId: _recordId,
             donorId: _donorId,
             recipientId: _recipientId,
@@ -119,15 +114,13 @@ contract OrganDonationContract {
             matchDate: _matchDate,
             status: _status
         });
-        
-        matchedRecords.push(newRecord);
-        emit MatchCreated(_recordId, _donorId, _recipientId, _organ, _matchDate);
-        CurrentAvailableMatchedID++;
-        return true;
+        TransplantedRecords.push(newRecord);
+        CurrentAvailableTransplantedID++;
+        emit Transplanted(_recordId, _donorId, _recipientId, _organ, _matchDate);
     }
     
-    function getMatchedRecords() public view returns (MatchedRecord[] memory) {
-        return matchedRecords;
+    function getTransplantedRecords() public view returns (TransplantedRecord[] memory) {
+        return TransplantedRecords;
     }
     
     function getMessage() public pure returns (string memory){

@@ -1,31 +1,31 @@
 import { contractProvider, contractSigner } from './contract';
 
-export const getAlldonorIDs = async () =>{
-  try {
+export const getAlldonorIDs=async () =>{
+  try{
     const tx=await contractProvider.getDonorIDs();
     console.log(tx);
     const donorIDs = Array.from(tx);
     console.log(donorIDs);
     return donorIDs;
-  } catch (error) {
+  }catch(error){
     console.log("Error in getting donor IDs from Blockchain",error);
   }
 }
-export const getAllrecipientIDs = async () =>{
-  try {
+export const getAllrecipientIDs=async () =>{
+  try{
     const tx=await contractProvider.getRecipientIDs();
     console.log(tx);
     const recipientIDs = Array.from(tx);
     console.log(recipientIDs);
     return recipientIDs;
-  } catch (error) {
+  }catch(error){
     console.log("Error in getting recipient IDs from Blockchain",error);
   }
 }
-export const insertMatchedRecord = async (record) => {
-  try {
+export const insertTransplantedRecord=async (record) => {
+  try{
     const { recordId, donorId, recipientId, organ, matchDate, status } = record;
-    const tx = await contractSigner.createMatch(
+    const tx = await contractSigner.createTransplant(
       recordId,
       donorId,
       recipientId,
@@ -34,16 +34,16 @@ export const insertMatchedRecord = async (record) => {
       status
     );
     await tx.wait();
-    console.log("Matched record inserted successfully!");
-  } catch (error) {
+    console.log("Transplant record inserted successfully!");
+  }catch(error){
     console.error("Error in inserting record in Blockchain:", error);
   }
 };
 
 export const getAllTransplantedRecords = async () => {
-  try {
-    const tx = await contractProvider.getMatchedRecords();
-    const MatchedRecords = tx.map(record => ({
+  try{
+    const tx = await contractProvider.getTransplantedRecords();
+    const TransplantRecords = tx.map(record => ({
       recordId: record.recordId,
       donorId: record.donorId,
       recipientId: record.recipientId,
@@ -51,20 +51,20 @@ export const getAllTransplantedRecords = async () => {
       matchDate: record.matchDate.toString(),
       status: record.status
     }));
-    // const MatchedRecords = Array.from(tx);
-    console.log("MatchedRecords Length:", MatchedRecords.length);
-    console.log("MatchedRecords:", MatchedRecords);
-    return MatchedRecords;
-  } catch (error) {
-    console.error("Error in getting matched records", error);
+    // const TransplantRecords = Array.from(tx);
+    console.log("TransplantRecords Length:", TransplantRecords.length);
+    console.log("TransplantRecords:", TransplantRecords);
+    return TransplantRecords;
+  }catch(error){
+    console.error("Error in getting Transplant records", error);
     return [];
   }
 };
 
-// Grab your JWT from Vite’s env
+//pinata jwt
 const PINATA_JWT = import.meta.env.VITE_PINATA_JWT;
 
-// Upload a JSON object to Pinata
+//uploading data to pinata ipfs
 export async function uploadDataToPinata(obj) {
   const res = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
     method: "POST",
@@ -82,7 +82,7 @@ export async function uploadDataToPinata(obj) {
   return IpfsHash;
 }
 
-// Retrieve a pinned JSON object via Pinata’s public gateway
+//retrieving data from pinata ipfs
 export async function retrieveDataFromPinata(cid) {
   const res = await fetch(`https://gateway.pinata.cloud/ipfs/${cid}`);
   if (!res.ok) {
@@ -135,10 +135,10 @@ export const getAllMatchedRecords = async () => {
 };
 
 export const transplant = async (record) => {
-  try {
+  try{
     //record the transplant on-chain
-    const nextID = await contractProvider.getCurrentAvailableMatchedID();
-    await insertMatchedRecord({
+    const nextID=await contractProvider.getCurrentAvailableTransplantedID();
+    await insertTransplantedRecord({
       recordId:    `T${nextID}`,
       donorId:     record.donorId,
       recipientId: record.recipientId,
@@ -150,18 +150,19 @@ export const transplant = async (record) => {
     //remove recipient
     const tx1=await contractSigner.removeRecipient(record.recipientId);
     await tx1.wait();
+
     //fetch, update, re-upload and re-register the donor
-    const donorCID = await contractProvider.getDonorCID(record.donorId);
-    const donor    = await retrieveDataFromPinata(donorCID);
-    const updated  = {
+    const donorCID=await contractProvider.getDonorCID(record.donorId);
+    const donor=await retrieveDataFromPinata(donorCID);
+    const updated={
       ...donor,
       organsAvailable: donor.organsAvailable.filter(o => o !== record.organ)
     };
-    const newCid = await uploadDataToPinata(updated);
+    const newCid=await uploadDataToPinata(updated);
 
-    const tx2 = await contractSigner.registerDonor(record.donorId, newCid);
+    const tx2=await contractSigner.registerDonor(record.donorId, newCid);
     await tx2.wait();
-  } catch (err) {
+  }catch(err){
     console.error("transplant failed:", err);
   }
 };
@@ -171,21 +172,21 @@ export const transplant = async (record) => {
 //   console.log(donorcid);
 // }
 
-// // Update Donor Status
+//Update Donor Status
 export const updateDonorStatus = async (donorId, status) => {
-  try {
+  try{
     // Call the updateDonorStatus function on the contract
     const donorCID = await contractProvider.getDonorCID(donorId);
     const donor    = await retrieveDataFromPinata(donorCID);
     
-    if(status=='deceased'){
+    if(status=='deceased' && donor.status!=='deceased'){
       donor.status=status;
       const newCid = await uploadDataToPinata(donor);
       const tx = await contractSigner.registerDonor(donorId, newCid);
       await tx.wait(); // Wait for the transaction to be mined
     }
     console.log(`Donor status updated to ${status} for Donor ID: ${donorId}`);
-  } catch (error) {
+  }catch(error){
     console.error("Error in updating donor status on Blockchain:", error);
   }
 };
