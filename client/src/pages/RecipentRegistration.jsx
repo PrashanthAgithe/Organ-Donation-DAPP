@@ -167,7 +167,7 @@ const RecipientRegistration = () => {
             <AlertDialogTitle>Confirm Registration</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="text-sm text-left space-y-1">
-                <p><strong>ID:</strong> {nextID}</p>
+                <p><strong>Recipient ID:</strong> {nextID}</p>
                 <p><strong>Name:</strong> {formData.name}</p>
                 <p><strong>Age:</strong> {formData.age}</p>
                 <p><strong>Blood Type:</strong> {formData.bloodType}</p>

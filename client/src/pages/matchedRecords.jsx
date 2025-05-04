@@ -21,7 +21,18 @@ export default function MatchedRecordsTable() {
 
   useEffect(() => {
     async function fetchRecords() {
+      const toastId = toast.loading('Loading Matched records...', {
+        position: 'bottom-right',
+        style: {
+          backgroundColor: 'white',
+          color: 'black',
+          fontSize: '16px',
+          borderRadius: '8px',
+          padding: '12px 24px',
+        },
+      });
       const data = await getAllMatchedRecords()
+      toast.dismiss(toastId);
       setRecords(data)
       setLoading(false)
     }

@@ -3,9 +3,8 @@ import { contractProvider, contractSigner } from './contract';
 export const getAlldonorIDs=async () =>{
   try{
     const tx=await contractProvider.getDonorIDs();
-    console.log(tx);
     const donorIDs = Array.from(tx);
-    console.log(donorIDs);
+    // console.log(donorIDs);
     return donorIDs;
   }catch(error){
     console.log("Error in getting donor IDs from Blockchain",error);
@@ -14,9 +13,8 @@ export const getAlldonorIDs=async () =>{
 export const getAllrecipientIDs=async () =>{
   try{
     const tx=await contractProvider.getRecipientIDs();
-    console.log(tx);
     const recipientIDs = Array.from(tx);
-    console.log(recipientIDs);
+    // console.log(recipientIDs);
     return recipientIDs;
   }catch(error){
     console.log("Error in getting recipient IDs from Blockchain",error);
@@ -34,7 +32,7 @@ export const insertTransplantedRecord=async (record) => {
       status
     );
     await tx.wait();
-    console.log("Transplant record inserted successfully!");
+    // console.log("Transplant record inserted successfully!");
   }catch(error){
     console.error("Error in inserting record in Blockchain:", error);
   }
@@ -52,8 +50,8 @@ export const getAllTransplantedRecords = async () => {
       status: record.status
     }));
     // const TransplantRecords = Array.from(tx);
-    console.log("TransplantRecords Length:", TransplantRecords.length);
-    console.log("TransplantRecords:", TransplantRecords);
+    // console.log("TransplantRecords Length:", TransplantRecords.length);
+    // console.log("TransplantRecords:", TransplantRecords);
     return TransplantRecords;
   }catch(error){
     console.error("Error in getting Transplant records", error);
@@ -107,7 +105,7 @@ export const getAllMatchedRecords = async () => {
       const recipient    = await retrieveDataFromPinata(recipientCID);
       const wants      = recipient.requiredOrgan;
       const hasOrgan = donor.organsAvailable.includes(wants);
-      const sameBlood= donor.bloodType === recipient.bloodType;
+      const sameBlood = donor.bloodType.toLowerCase() === recipient.bloodType.toLowerCase();
       if (!hasOrgan || !sameBlood) continue;
 
       // const already = existing.some(r =>
@@ -185,7 +183,7 @@ export const updateDonorStatus = async (donorId, status) => {
       const tx = await contractSigner.registerDonor(donorId, newCid);
       await tx.wait(); // Wait for the transaction to be mined
     }
-    console.log(`Donor status updated to ${status} for Donor ID: ${donorId}`);
+    // console.log(`Donor status updated to ${status} for Donor ID: ${donorId}`);
   }catch(error){
     console.error("Error in updating donor status on Blockchain:", error);
   }

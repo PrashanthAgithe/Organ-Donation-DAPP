@@ -37,7 +37,7 @@ import { AlertDialogDescription } from "@radix-ui/react-alert-dialog";
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [status, setStatus] = useState("live");
+  const [status, setStatus] = useState("deceased");
   const [donorId, setDonorId] = useState(""); // State to track donor ID
 
   const check = async () => {
@@ -143,15 +143,15 @@ const LandingPage = () => {
               <div className="mb-3">
                 <Label className="block text-sm font-medium text-gray-700">Status</Label>
                 <Select
-                  defaultValue="alive"
+                  defaultValue="deceased"
                   onValueChange={(value) => setStatus(value)}
                 >
                   <SelectTrigger className="mt-2 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="alive">Alive</SelectItem>
                     <SelectItem value="deceased">Deceased</SelectItem>
+                    <SelectItem value="alive" disabled>Alive</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

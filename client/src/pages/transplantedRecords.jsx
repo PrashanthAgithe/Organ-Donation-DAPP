@@ -1,7 +1,6 @@
 import { format } from "date-fns"
-import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
-import { getAllTransplantedRecords } from "../main" // Make sure you have a function to fetch transplanted records
+import { getAllTransplantedRecords, retrieveDataFromPinata } from "../main" 
 import {
   Table,
   TableBody,
@@ -11,11 +10,24 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog"
+import { contractProvider } from "@/contract"
+import { Button } from "@/components/ui/button"
 
 export default function TransplantedRecordsTable() {
   const [records, setRecords] = useState([])
   const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
+  const [openDialog, setOpenDialog] = useState(false)
+  const [selectedDetails, setSelectedDetails] = useState(null)
+  const [isDonor, setIsDonor] = useState(true)
 
   useEffect(() => {
     async function fetchRecords() {
@@ -26,7 +38,20 @@ export default function TransplantedRecordsTable() {
 
     fetchRecords()
   }, [])
-
+  const getDonorDetails= async (donorId,transplantedOrgan)=>{
+    const donorCID=await contractProvider.getDonorCID(donorId);
+    const donor=await retrieveDataFromPinata(donorCID);
+    setIsDonor(true)
+    setSelectedDetails({ id: donorId,transplantedOrgan:transplantedOrgan, ...donor })
+    setOpenDialog(true)
+  }
+  const getRecipientDetails= async (recipientId,transplantedOrgan)=>{
+    const recipientCID=await contractProvider.getRecipientCID(recipientId);
+    const recipient=await retrieveDataFromPinata(recipientCID);
+    setIsDonor(false)
+    setSelectedDetails({ id: recipientId,transplantedOrgan:transplantedOrgan, ...recipient })
+    setOpenDialog(true)
+  }
   if (loading) return <p className="text-center mt-10 text-lg">Loading transplanted records...</p>
 
   if (records.length === 0)
@@ -54,8 +79,26 @@ export default function TransplantedRecordsTable() {
               {records.map((record) => (
                 <TableRow key={record.recordId}>
                   <TableCell>{record.recordId}</TableCell>
-                  <TableCell>{record.donorId}</TableCell>
-                  <TableCell>{record.recipientId}</TableCell>
+                  <TableCell>
+                    {record.donorId}
+                    <Button
+                      variant="link"
+                      className="ml-2 text-blue-600 hover:underline cursor-pointer"
+                      onClick={() => getDonorDetails(record.donorId,record.organ)}
+                    >
+                      View Details
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    {record.recipientId}
+                    <Button
+                      variant="link"
+                      className="ml-2 text-blue-600 hover:underline cursor-pointer"
+                      onClick={() => getRecipientDetails(record.recipientId,record.organ)}
+                    >
+                      View Details
+                    </Button>
+                  </TableCell>
                   <TableCell>{record.organ}</TableCell>
                   <TableCell>
                     {format(new Date(parseInt(record.matchDate) * 1000), "PPPpp")}
@@ -71,6 +114,38 @@ export default function TransplantedRecordsTable() {
           </Table>
         </div>
       </div>
+      <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {isDonor ? "Donor Details" : "Recipient Details"}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-left text-sm text-muted-foreground">
+                {selectedDetails && (
+                  <>
+                    <p><strong>{isDonor?"Donor ID:":"Recipient ID:"}</strong> {selectedDetails.id}</p>
+                    <p><strong>Name:</strong> {selectedDetails.name}</p>
+                    <p><strong>Age:</strong> {selectedDetails.age}</p>
+                    <p><strong>Blood Type:</strong> {selectedDetails.bloodType}</p>
+                    <p><strong>Transplanted Organ:</strong> {selectedDetails.transplantedOrgan}</p>
+                    <p><strong>Contact Info:</strong> {selectedDetails.contactInfo}</p>
+                    {isDonor?<p><strong>Status:</strong> {selectedDetails.status}</p>:<></>}
+                  </>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+          <AlertDialogCancel asChild>
+            <Button className="bg-black text-white hover:bg-black hover:text-white hover:outline hover:outline-2 hover:outline-white cursor-pointer">
+              Close
+            </Button>
+          </AlertDialogCancel>
+
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
