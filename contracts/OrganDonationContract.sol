@@ -105,7 +105,7 @@ contract OrganDonationContract {
         return CurrentAvailableTransplantedID;
     }
 
-    function createTransplant(string memory _recordId,string memory _donorId,string memory _recipientId,string memory _organ,uint _matchDate,string memory _status) public{
+    function createTransplant(string memory _recordId,string memory _donorId,string memory _recipientId,string memory _organ,uint _matchDate,string memory _status,string memory newDonorCID) public{
         TransplantedRecord memory newRecord = TransplantedRecord({
             recordId: _recordId,
             donorId: _donorId,
@@ -116,6 +116,8 @@ contract OrganDonationContract {
         });
         TransplantedRecords.push(newRecord);
         CurrentAvailableTransplantedID++;
+        removeRecipient(_recipientId);
+        registerDonor(_donorId,newDonorCID);
         emit Transplanted(_recordId, _donorId, _recipientId, _organ, _matchDate);
     }
     

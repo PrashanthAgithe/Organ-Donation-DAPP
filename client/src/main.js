@@ -22,19 +22,21 @@ export const getAllrecipientIDs=async () =>{
 }
 export const insertTransplantedRecord=async (record) => {
   try{
-    const { recordId, donorId, recipientId, organ, matchDate, status } = record;
+    const { recordId, donorId, recipientId, organ, matchDate, status, newDonorCID } = record;
     const tx = await contractSigner.createTransplant(
       recordId,
       donorId,
       recipientId,
       organ,
       matchDate,
-      status
+      status,
+      newDonorCID
     );
     await tx.wait();
-    // console.log("Transplant record inserted successfully!");
+    console.log("Transplant record inserted successfully!");
   }catch(error){
     console.error("Error in inserting record in Blockchain:", error);
+    throw error;
   }
 };
 
@@ -134,21 +136,6 @@ export const getAllMatchedRecords = async () => {
 
 export const transplant = async (record) => {
   try{
-    //record the transplant on-chain
-    const nextID=await contractProvider.getCurrentAvailableTransplantedID();
-    await insertTransplantedRecord({
-      recordId:    `T${nextID}`,
-      donorId:     record.donorId,
-      recipientId: record.recipientId,
-      organ:       record.organ,
-      matchDate:   Math.floor(Date.now() / 1000),
-      status:      "transplanted"
-    });
-
-    //remove recipient
-    const tx1=await contractSigner.removeRecipient(record.recipientId);
-    await tx1.wait();
-
     //fetch, update, re-upload and re-register the donor
     const donorCID=await contractProvider.getDonorCID(record.donorId);
     const donor=await retrieveDataFromPinata(donorCID);
@@ -157,11 +144,20 @@ export const transplant = async (record) => {
       organsAvailable: donor.organsAvailable.filter(o => o !== record.organ)
     };
     const newCid=await uploadDataToPinata(updated);
-
-    const tx2=await contractSigner.registerDonor(record.donorId, newCid);
-    await tx2.wait();
+    //record the transplant on-chain
+    const nextID=await contractProvider.getCurrentAvailableTransplantedID();
+    await insertTransplantedRecord({
+      recordId:    `T${nextID}`,
+      donorId:     record.donorId,
+      recipientId: record.recipientId,
+      organ:       record.organ,
+      matchDate:   Math.floor(Date.now() / 1000),
+      status:      "transplanted",
+      newDonorCID: newCid
+    });
   }catch(err){
     console.error("transplant failed:", err);
+    throw err;
   }
 };
 
