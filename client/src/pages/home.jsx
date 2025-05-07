@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEthereum, FaHeartbeat, FaShieldAlt, FaRegHandshake } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import './home.css'
 import {
     AlertDialog,
     AlertDialogTrigger,
@@ -89,59 +89,29 @@ const LandingPage = () => {
             <header className="relative flex items-center justify-center h-screen p-8 bg-cover bg-center text-white overflow-hidden"
     style={{ backgroundImage: `url('https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTEyL3Jhd3BpeGVsb2ZmaWNlMjFfMmRfbWluaW1hbF9ncnBoaWNfb2ZfYmxvY2tjaGFpbl9jdWJlc19uZXR3b3JrX182NjExODM0My0xZWQ5LTRiOGUtYTdmOC03ZTc0ODEzZWEwNTNfMS5qcGc.jpg')` }}
 >
-    <div className="absolute inset-0 bg-black opacity-30"></div> {/* Overlay for better text readability */}
+    <div className="absolute inset-0 bg-black opacity-20"></div> {/* Overlay for better text readability */}
     <div className="relative z-10 text-center max-w-5xl animate-slide-up">
-        <h1 className="text-5xl md:text-5xl font-bold mb-6 leading-tight">
-            Decentralized Organ Donation System
-        </h1>
-        <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-10 text-gray-100">
-            A secure, transparent, and tamper-proof organ donation system powered by blockchain technology
-        </p>
+        <div className="header-container">
+            <div className="header-content">
+                <h1 className="main-title" aria-label="Decentralized Organ Donation System">Decentralized Organ Donation System</h1>
+                <div className="subtitle">A secure, transparent, and tamper-proof organ donation system powered by blockchain technology</div>
+                <div className="header-decoration"></div>
+            </div>
+        </div>
 
         {showButtons && (
             <div className="flex flex-col gap-4 items-center">
-                <Button
-                    onClick={() => navigate('/donor-registration')}
-                    className="w-full max-w-xs px-8 py-6 font-medium rounded-full shadow-lg transition-all duration-300 cursor-pointer
-                               bg-gradient-to-r from-blue-600 to-blue-600 text-white hover:from-blue-600 hover:to-blue-600
-                               hover:shadow-xl transform hover:-translate-y-1 text-lg"
-                >
-                    Donor Registration
-                </Button>
-
-                <Button
-                    onClick={() => navigate('/recipient-registration')}
-                    className="w-full max-w-xs px-8 py-6 font-medium rounded-full shadow-lg transition-all duration-300 cursor-pointer
-                               bg-gradient-to-r from-blue-600 to-blue-600 text-white hover:from-blue-600 hover:to-blue-600
-                               hover:shadow-xl transform hover:-translate-y-1 text-lg"
-                >
-                    Recipient Registration
-                </Button>
-
-                <Button
-                    onClick={() => navigate('/getMatchedRecords')}
-                    className="w-full max-w-xs px-8 py-6 font-medium rounded-full shadow-lg transition-all duration-300 cursor-pointer
-                               bg-gradient-to-r from-blue-600 to-blue-600 text-white hover:from-blue-600 hover:to-blue-600
-                               hover:shadow-xl transform hover:-translate-y-1 text-lg"
-                >
-                    View Matched Records
-                </Button>
-
-                <Button
-                    onClick={() => navigate('/getTransplantedRecords')}
-                    className="w-full max-w-xs px-8 py-6 font-medium rounded-full shadow-lg transition-all duration-300 cursor-pointer
-                               bg-gradient-to-r from-blue-600 to-blue-600 text-white hover:from-blue-600 hover:to-blue-600
-                               hover:shadow-xl transform hover:-translate-y-1 text-lg"
-                >
-                    Transplant Records
-                </Button>
+                <button onClick={() => navigate('/donor-registration')} className="button-79">Donor Registration</button>
+                <button onClick={() => navigate('/recipient-registration')} className="button-79">Recipient Registration</button>
+                <button onClick={() => navigate('/getMatchedRecords')} className="button-79">View Matched Records</button>
+                <button onClick={() => navigate('/getTransplantedRecords')} className="button-79">Transplant Records</button>
             </div>
         )}
 
         <div className="mt-6">
             <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <Button className="donor-status-btn bg-red-600 text-white hover:bg-red-800 cursor-pointer">
+                    <Button className="donor-status-btn bg-red-600 text-white hover:bg-red-800 cursor-pointer button-79">
                         Update Donor Status
                     </Button>
                 </AlertDialogTrigger>
@@ -190,7 +160,7 @@ const LandingPage = () => {
                             onClick={handleSubmitStatus}
                             className="px-5 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-300"
                         >
-                            Update Status
+                            Submit
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

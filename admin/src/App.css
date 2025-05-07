@@ -1,0 +1,162 @@
+.button-79 {
+  align-items: center;
+  appearance: none;
+  background-clip: padding-box;
+  background-color: initial;
+  background-image: none;
+  border-style: none;
+  box-sizing: border-box;
+  color: #fff; /* Default text color is white */
+  cursor: pointer;
+  display: inline-block;
+  flex-direction: row;
+  flex-shrink: 0;
+  font-family: Eina01, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  justify-content: center;
+  line-height: 24px;
+  margin: 0;
+  min-height: 64px;
+  outline: none;
+  overflow: visible;
+  padding: 19px 26px;
+  pointer-events: auto;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  text-transform: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  width: auto;
+  word-break: keep-all;
+  z-index: 0;
+}
+
+@media (min-width: 768px) {
+  .button-79 {
+    padding: 19px 32px;
+  }
+}
+
+.button-79:before,
+.button-79:after {
+  border-radius: 80px;
+}
+
+.button-79:before {
+  background-image: linear-gradient(92.83deg, #000000 0%, #434343 100%); /* Black to Dark Gray */
+  content: "";
+  display: block;
+  height: 100%;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: -2;
+}
+
+.button-79:after {
+  background-color: initial;
+  background-image: linear-gradient(#222222 0%, #000000 100%); /* Even Darker Inner Shadow */
+  bottom: 4px;
+  content: "";
+  display: block;
+  left: 4px;
+  overflow: hidden;
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  transition: all 100ms ease-out;
+  z-index: -1;
+}
+
+.button-79:hover:not(:disabled):before {
+  background: linear-gradient(92.83deg, rgb(0, 0, 0) 0%, rgb(67, 67, 67) 100%); /* Slightly lighter on hover */
+}
+
+.button-79:hover:not(:disabled):after {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  transition-timing-function: ease-in;
+  opacity: 0;
+}
+
+.button-79:active:not(:disabled) {
+  color: #ccc; /* Text becomes slightly gray on active */
+}
+
+.button-79:active:not(:disabled):before {
+  background-image: linear-gradient(0deg, rgba(0, 0, 0, .2), rgba(0, 0, 0, .2)),
+    linear-gradient(92.83deg, #000000 0%, #434343 100%);
+}
+
+.button-79:active:not(:disabled):after {
+  background-image: linear-gradient(#222222 0%, #000000 100%);
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  top: 4px;
+}
+
+.button-79:disabled {
+  cursor: default;
+  opacity: .24;
+}
+.custom-input {
+  padding: 19px 26px;
+  border-radius: 80px;
+  border: none;
+  background-image: linear-gradient(92.83deg, #000000 0%, #434343 100%);
+  color: #fff;
+  font-family: Eina01, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  outline: none;
+  border: 1.5px solid white;
+  transition: all 0.3s ease;
+  width: calc(100% - 2rem); /* Adjust width to account for padding and margin */
+  max-width: 520px; /*Added a max width*/
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.custom-input:focus {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5); /* Add a white glow */
+  outline: none;
+}
+
+.custom-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #fff;
+  font-family: Eina01, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  text-align: left;
+}
+.custom-heading{
+  display: block;
+  margin-bottom: 8px;
+  color: #fff;
+  font-family: Eina01, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  text-align: left;
+}
+  @media (min-width: 768px) {
+    .custom-input {
+      padding: 19px 32px;
+    }
+  }
+
+  .main-container{
+    min-width:1000px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }

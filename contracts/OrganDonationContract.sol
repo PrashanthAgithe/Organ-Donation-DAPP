@@ -2,6 +2,55 @@
 pragma solidity ^0.8.28;
 
 contract OrganDonationContract {
+    address public owner;
+    address[] public authorized;
+
+    constructor(){
+        owner=msg.sender;
+    }
+    modifier onlyOwner(){
+        require(msg.sender==owner,"You are not the contract owner");
+        _;
+    }
+    function addAuthorized(address _addr) public onlyOwner{
+        // require(!isAuthorized(_addr), "Already authorized");
+        authorized.push(_addr);
+    }
+    function removeAuthorized(address _addr) public onlyOwner{
+        for(uint i=0;i<authorized.length;i++){
+            if(authorized[i]==_addr){
+                authorized[i]=authorized[authorized.length-1];
+                authorized.pop();
+                break;
+            }
+        }
+    }
+    function isAuthorized(address _addr) public view returns(bool){
+        for(uint i=0;i<authorized.length;i++){
+            if(authorized[i]==_addr){
+                return true;
+            }
+        }
+        if(owner==_addr) return true;
+        return false;
+    }
+    modifier onlyAuthorized(){
+        require(isAuthorized(msg.sender),"Not an authorized address");
+        _;
+    }
+    function getAuthorized() public view returns(address[] memory){
+        return authorized;
+    }
+    uint private CurrentAvailableDonorID=0;
+    uint private CurrentAvailableRecipientID=0;
+    uint private CurrentAvailableTransplantedID=0;
+
+    mapping(string => string) private donorCIDs;
+    mapping(string => string) private recipientCIDs;
+    
+    string[] private donorIDs;
+    string[] private recipientIDs;
+
     //struct to store Transplanted records
     struct TransplantedRecord {
         string recordId;
@@ -12,15 +61,6 @@ contract OrganDonationContract {
         string status;
     }
 
-    uint private CurrentAvailableDonorID=0;
-    uint private CurrentAvailableRecipientID=0;
-    uint private CurrentAvailableTransplantedID=0;
-
-    mapping(string => string) private donorCIDs;
-    mapping(string => string) private recipientCIDs;
-    
-    string[] private donorIDs;
-    string[] private recipientIDs;
     TransplantedRecord[] private TransplantedRecords;
     
     //events to log activities
@@ -32,7 +72,7 @@ contract OrganDonationContract {
         return CurrentAvailableDonorID;
     }
 
-    function registerDonor(string memory donorId, string memory cid) public {
+    function registerDonor(string memory donorId, string memory cid) public onlyAuthorized{
         bool exists = bytes(donorCIDs[donorId]).length > 0;
         donorCIDs[donorId] = cid;
         if (!exists) {
@@ -70,7 +110,7 @@ contract OrganDonationContract {
         return CurrentAvailableRecipientID;
     }
 
-    function registerRecipient(string memory recipientId,string memory cid) public {
+    function registerRecipient(string memory recipientId,string memory cid) public onlyAuthorized{
         recipientCIDs[recipientId]=cid;
         recipientIDs.push(recipientId);
         CurrentAvailableRecipientID++;
@@ -105,7 +145,7 @@ contract OrganDonationContract {
         return CurrentAvailableTransplantedID;
     }
 
-    function createTransplant(string memory _recordId,string memory _donorId,string memory _recipientId,string memory _organ,uint _matchDate,string memory _status,string memory newDonorCID) public{
+    function createTransplant(string memory _recordId,string memory _donorId,string memory _recipientId,string memory _organ,uint _matchDate,string memory _status,string memory newDonorCID) public onlyAuthorized{
         TransplantedRecord memory newRecord = TransplantedRecord({
             recordId: _recordId,
             donorId: _donorId,
