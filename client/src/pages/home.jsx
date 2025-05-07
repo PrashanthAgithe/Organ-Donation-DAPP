@@ -1,216 +1,314 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaEthereum } from "react-icons/fa";
-
+import { FaEthereum, FaHeartbeat, FaShieldAlt, FaRegHandshake } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
+    AlertDialog,
+    AlertDialogTrigger,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogFooter,
+    AlertDialogCancel,
+    AlertDialogAction,
+    AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
+    Select,
+    SelectTrigger,
+    SelectValue,
+    SelectContent,
+    SelectItem,
 } from "@/components/ui/select";
-import {
-  getAlldonorIDs,
-  getAllMatchedRecords,
-  getAllrecipientIDs,
-  getAllTransplantedRecords,
-  insertTransplantedRecord,
-  updateDonorStatus
-} from "../main";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { AlertDialogDescription } from "@radix-ui/react-alert-dialog";
+import { updateDonorStatus } from "../main";
 
 const LandingPage = () => {
-  const navigate = useNavigate();
-  const [status, setStatus] = useState("deceased");
-  const [donorId, setDonorId] = useState(""); // State to track donor ID
+    const navigate = useNavigate();
+    const [status, setStatus] = useState("deceased");
+    const [donorId, setDonorId] = useState("");
+    const [showButtons, setShowButtons] = useState(true);
+    const whiteSectionRef = useRef(null);
+    const [isWhiteVisible, setIsWhiteVisible] = useState(false);
 
-  const check = async () => {
-    try {
-      const msg = await contractProvider.getMessage();
-      console.log(msg);
-    } catch (error) {
-      console.log("Error in getting message from Blockchain:", error);
-    }
-  };
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 500) {
+                setShowButtons(false);
+            } else {
+                setShowButtons(true);
+            }
 
-  // handle status submission and update
-  const handleSubmitStatus = async () => {
-    if (!donorId || !status) {
-      toast.error("Please enter both Donor ID and status");
-      return;
-    }
-    const toastId = toast.loading('Updating donor status...', {
-      position: 'bottom-right',
-      style: {
-        backgroundColor: 'white',
-        color: 'black',
-        fontSize: '16px',
-        borderRadius: '8px',
-        padding: '12px 24px',
-      },
-    });
-    try {
-      await updateDonorStatus(donorId, status);
-      toast.success(`Donor ${donorId} status updated to ${status}`, {
-        id: toastId,
-      });
-      // Clear form after successful update
-      setDonorId("");
-      setStatus("");
-    } catch (error) {
-      console.error("Failed to update donor status:", error);
-      toast.error("Failed to update status. Check console for details.");
-    }
-  };
+            if (whiteSectionRef.current) {
+                const rect = whiteSectionRef.current.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight;
+                setIsWhiteVisible(isVisible);
+            }
+        };
 
-  return (
-    <div className="min-h-screen bg-gray-100 text-gray-900">
-      {/* Hero Section */}
-      <header className="flex flex-col items-center justify-center h-screen text-center p-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-        <h1 className="text-5xl font-bold mb-4">Decentralized Organ Donation System</h1>
-        <p className="text-lg max-w-2xl">
-          A secure, transparent, and tamper-proof organ donation system powered by blockchain.
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
+    const handleSubmitStatus = async () => {
+        if (!donorId || !status) {
+            toast.error("Please enter both Donor ID and status");
+            return;
+        }
+        const toastId = toast.loading('Updating donor status...', {
+            position: 'bottom-right',
+            style: {
+                backgroundColor: 'white',
+                color: 'black',
+                fontSize: '16px',
+                borderRadius: '8px',
+                padding: '12px 24px',
+            },
+        });
+        try {
+            await updateDonorStatus(donorId, status);
+            toast.success(`Donor ${donorId} status updated to ${status}`, {
+                id: toastId,
+            });
+            setDonorId("");
+            setStatus("");
+        } catch (error) {
+            console.error("Failed to update donor status:", error);
+            toast.error("Failed to update status. Check console for details.");
+        }
+    };
+
+    return (
+        <div className="min-h-screen">
+            {/* Hero Section */}
+            <header className="relative flex items-center justify-center h-screen p-8 bg-cover bg-center text-white overflow-hidden"
+    style={{ backgroundImage: `url('https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTEyL3Jhd3BpeGVsb2ZmaWNlMjFfMmRfbWluaW1hbF9ncnBoaWNfb2ZfYmxvY2tjaGFpbl9jdWJlc19uZXR3b3JrX182NjExODM0My0xZWQ5LTRiOGUtYTdmOC03ZTc0ODEzZWEwNTNfMS5qcGc.jpg')` }}
+>
+    <div className="absolute inset-0 bg-black opacity-30"></div> {/* Overlay for better text readability */}
+    <div className="relative z-10 text-center max-w-5xl animate-slide-up">
+        <h1 className="text-5xl md:text-5xl font-bold mb-6 leading-tight">
+            Decentralized Organ Donation System
+        </h1>
+        <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-10 text-gray-100">
+            A secure, transparent, and tamper-proof organ donation system powered by blockchain technology
         </p>
-        <div className="flex flex-wrap justify-center align-center gap-4 mt-6">
-          <Button
-            onClick={() => navigate('/donor-registration')}
-            className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
-          >
-            Donor Registration
-          </Button>
-          <Button
-            onClick={() => navigate('/recipient-registration')}
-            className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
-          >
-            Recipient Registration
-          </Button>
-          <Button
-            onClick={() => navigate('/getMatchedRecords')}
-            className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
-          >
-            Get All Matched Records
-          </Button>
-          <Button
-            onClick={() => navigate('/getTransplantedRecords')}
-            className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md"
-          >
-            View Transplanted Records
-          </Button>
 
-          {/* Update Donor Status Dialog */}
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button className="px-6 py-3 text-lg bg-white text-blue-600 hover:bg-gray-200 rounded-lg shadow-md transition-all duration-300">
-                Update Donor Status
-              </Button>
-            </AlertDialogTrigger>
-
-            <AlertDialogContent className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
-              <AlertDialogHeader className="text-center mb-4">
-                <AlertDialogTitle className="text-2xl font-semibold text-gray-800">
-                  Update Donor Status
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-sm text-gray-600 mt-2">
-                  Enter the donor ID and select the appropriate status to update donor information.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-
-              <div className="mb-3">
-                <Label className="block text-sm font-medium text-gray-700">Donor Id</Label>
-                <Input
-                  value={donorId}
-                  onChange={(e) => setDonorId(e.target.value)}
-                  className="mt-2 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div className="mb-3">
-                <Label className="block text-sm font-medium text-gray-700">Status</Label>
-                <Select
-                  defaultValue="deceased"
-                  onValueChange={(value) => setStatus(value)}
+        {showButtons && (
+            <div className="flex flex-col gap-4 items-center">
+                <Button
+                    onClick={() => navigate('/donor-registration')}
+                    className="w-full max-w-xs px-8 py-6 font-medium rounded-full shadow-lg transition-all duration-300 cursor-pointer
+                               bg-gradient-to-r from-blue-600 to-blue-600 text-white hover:from-blue-600 hover:to-blue-600
+                               hover:shadow-xl transform hover:-translate-y-1 text-lg"
                 >
-                  <SelectTrigger className="mt-2 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="deceased">Deceased</SelectItem>
-                    <SelectItem value="alive" disabled>Alive</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                    Donor Registration
+                </Button>
 
-              <AlertDialogFooter className="flex justify-between">
-                <AlertDialogCancel className="text-sm text-gray-600 hover:text-gray-800">
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleSubmitStatus}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300"
+                <Button
+                    onClick={() => navigate('/recipient-registration')}
+                    className="w-full max-w-xs px-8 py-6 font-medium rounded-full shadow-lg transition-all duration-300 cursor-pointer
+                               bg-gradient-to-r from-blue-600 to-blue-600 text-white hover:from-blue-600 hover:to-blue-600
+                               hover:shadow-xl transform hover:-translate-y-1 text-lg"
                 >
-                  Submit
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                    Recipient Registration
+                </Button>
 
+                <Button
+                    onClick={() => navigate('/getMatchedRecords')}
+                    className="w-full max-w-xs px-8 py-6 font-medium rounded-full shadow-lg transition-all duration-300 cursor-pointer
+                               bg-gradient-to-r from-blue-600 to-blue-600 text-white hover:from-blue-600 hover:to-blue-600
+                               hover:shadow-xl transform hover:-translate-y-1 text-lg"
+                >
+                    View Matched Records
+                </Button>
 
+                <Button
+                    onClick={() => navigate('/getTransplantedRecords')}
+                    className="w-full max-w-xs px-8 py-6 font-medium rounded-full shadow-lg transition-all duration-300 cursor-pointer
+                               bg-gradient-to-r from-blue-600 to-blue-600 text-white hover:from-blue-600 hover:to-blue-600
+                               hover:shadow-xl transform hover:-translate-y-1 text-lg"
+                >
+                    Transplant Records
+                </Button>
+            </div>
+        )}
+
+        <div className="mt-6">
+            <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button className="donor-status-btn bg-red-600 text-white hover:bg-red-800 cursor-pointer">
+                        Update Donor Status
+                    </Button>
+                </AlertDialogTrigger>
+
+                <AlertDialogContent className="max-w-md mx-auto bg-white rounded-xl shadow-2xl p-6 border-0">
+                    <AlertDialogHeader className="text-center mb-4">
+                        <AlertDialogTitle className="text-2xl font-semibold text-gray-800">
+                            Update Donor Status
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-sm text-gray-600 mt-2">
+                            Enter the donor ID and select the appropriate status to update donor information.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <div className="mb-4">
+                        <Label className="block text-sm font-medium text-gray-700 mb-1">Donor ID</Label>
+                        <Input
+                            value={donorId}
+                            onChange={(e) => setDonorId(e.target.value)}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-organ-primary focus:border-organ-primary transition-all"
+                            placeholder="Enter donor ID"
+                        />
+                    </div>
+
+                    <div className="mb-6">
+                        <Label className="block text-sm font-medium text-gray-700 mb-1">Status</Label>
+                        <Select
+                            defaultValue="deceased"
+                            onValueChange={(value) => setStatus(value)}
+                        >
+                            <SelectTrigger className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-organ-primary focus:border-organ-primary transition-all">
+                                <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent position="item-aligned" className="bg-white border-0 shadow-lg rounded-lg">
+                                <SelectItem value="deceased" className="p-2 cursor-pointer hover:bg-gray-100 rounded-md">Deceased</SelectItem>
+                                <SelectItem value="alive" disabled className="p-2 text-gray-400">Alive</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <AlertDialogFooter className="flex justify-between">
+                        <AlertDialogCancel className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all">
+                            Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleSubmitStatus}
+                            className="px-5 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-300"
+                        >
+                            Update Status
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
-      </header>
-
-      {/* Features Section */}
-      <section className="p-10 bg-white text-center">
-        <h2 className="text-3xl font-semibold mb-6">Why Choose Blockchain?</h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Transparency</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Immutable records ensure full trust and security.</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Security</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Blockchain encrypts donor and recipient data.</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Decentralization</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>No single entity controls the donation process.</p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="text-center p-6 bg-gray-900 text-white">
-        <p>&copy; 2025 Decentralized Organ Donation. Built with <FaEthereum className="inline text-xl" /> Blockchain.</p>
-      </footer>
     </div>
-  );
+    <div className="absolute bottom-0 left-0 right-0 h-3 bg-gradient-to-t from-blue-100 to-transparent"></div>
+</header>
+
+            {/* Remainder of the page with white background */}
+            <div ref={whiteSectionRef} className={isWhiteVisible ? "bg-white" : ""}>
+                {/* Features Section */}
+                <section className="py-20 px-6">
+                    <div className="max-w-7xl mx-auto">
+                        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Why Choose Blockchain?</h2>
+                        <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-12">
+                            Our platform leverages blockchain technology to ensure security, transparency, and trust
+                            in the organ donation process.
+                        </p>
+
+                        <div className="grid md:grid-cols-3 gap-8">
+                            <div className="feature-card p-6 group border-2 rounded-lg transition-all transform hover:-translate-y-2 hover:shadow-lg">
+                                <div className="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center mb-4 mx-auto">
+                                    <FaShieldAlt className="h-7 w-7 text-organ-primary" />
+                                </div>
+                                <h3 className="text-xl font-semibold text-center mb-3">Security</h3>
+                                <p className="text-gray-600 text-center">
+                                    Advanced encryption protects sensitive donor and recipient data while ensuring integrity of all
+                                    records.
+                                </p>
+                            </div>
+
+                            <div className="feature-card p-6 group border-2 rounded-lg transition-all transform hover:-translate-y-2 hover:shadow-lg">
+                                <div className="h-14 w-14 rounded-full bg-purple-100 flex items-center justify-center mb-4 mx-auto">
+                                    <FaHeartbeat className="h-7 w-7 text-organ-secondary" />
+                                </div>
+                                <h3 className="text-xl font-semibold text-center mb-3">Transparency</h3>
+                                <p className="text-gray-600 text-center">
+                                    Immutable blockchain records ensure complete transparency and auditability throughout the
+                                    donation process.
+                                </p>
+                            </div>
+
+                            <div className="feature-card p-6 group border-2 rounded-lg transition-all transform hover:-translate-y-2 hover:shadow-lg">
+                                <div className="h-14 w-14 rounded-full bg-indigo-100 flex items-center justify-center mb-4 mx-auto">
+                                    <FaRegHandshake className="h-7 w-7 text-organ-tertiary" />
+                                </div>
+                                <h3 className="text-xl font-semibold text-center mb-3">Decentralization</h3>
+                                <p className="text-gray-600 text-center">
+                                    Distributed network ensures no single entity controls the donation process, preventing
+                                    manipulation.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Stats Section */}
+                <section className="py-16 px-6 bg-gradient-to-br from-organ-primary/5 to-organ-secondary/5">
+    <div className="max-w-7xl mx-auto text-center">
+        <h2 className="text-3xl font-bold mb-12">Transforming Organ Donation</h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="stat-card p-6 group border rounded-lg transition-all transform hover:-translate-y-2 hover:shadow-lg">
+                <div className="text-4xl font-bold text-green-500 mb-2 animate-pulse-gentle">100%</div>
+                <p className="text-gray-600">Record Accuracy</p>
+            </div>
+
+            <div className="stat-card p-6 group border rounded-lg transition-all transform hover:-translate-y-2 hover:shadow-lg">
+                <div className="text-4xl font-bold text-blue-500 mb-2 animate-pulse-gentle">0%</div>
+                <p className="text-gray-600">Data Manipulation</p>
+            </div>
+
+            <div className="stat-card p-6 group border rounded-lg transition-all transform hover:-translate-y-2 hover:shadow-lg">
+                <div className="text-4xl font-bold text-green-500 mb-2 animate-pulse-gentle">24/7</div>
+                <p className="text-gray-600">System Availability</p>
+            </div>
+
+            <div className="stat-card p-6 group border rounded-lg transition-all transform hover:-translate-y-2 hover:shadow-lg">
+                <div className="text-4xl font-bold text-blue-500 mb-2 animate-pulse-gentle">100%</div>
+                <p className="text-gray-600">Process Transparency</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+                {/* Footer */}
+                <footer className="bg-gray-900 text-white py-12 px-6">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="flex flex-col md:flex-row justify-between items-center">
+                            <div className="mb-6 md:mb-0">
+                                <div className="flex items-center justify-center md:justify-start">
+                                    <FaEthereum className="text-3xl mr-3 text-organ-secondary" />
+                                    <span className="text-xl font-bold">Decentralized Organ Donation</span>
+                                </div>
+                                <p className="mt-2 text-gray-400 text-sm">
+                                    A secure and transparent platform powered by blockchain.
+                                </p>
+                            </div>
+
+                            <div className="flex space-x-4">
+                                <a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
+                                <a href="#" className="text-gray-400 hover:text-white transition-colors">Terms of Use</a>
+                                <a href="#" className="text-gray-400 hover:text-white transition-colors">Contact</a>
+                            </div>
+                        </div>
+
+                        <div className="border-t border-gray-800 mt-8 pt-8 text-center md:text-left">
+                            <p className="text-gray-500 text-sm">
+                                &copy; {new Date().getFullYear()} Decentralized Organ Donation. All rights reserved.
+                            </p>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    );
 };
 
 export default LandingPage;
+
