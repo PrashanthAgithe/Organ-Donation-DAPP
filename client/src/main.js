@@ -95,35 +95,55 @@ export const getAllMatchedRecords = async () => {
   const donorIDs     = await getAlldonorIDs();
   const recipientIDs = await getAllrecipientIDs();
   // const existing     = await getAllTransplantedRecords();
-  const matches      = [];
-
-  for (const donorId of donorIDs) {
-    const donorCID = await contractProvider.getDonorCID(donorId);
-    const donor    = await retrieveDataFromPinata(donorCID);
-    if (donor.status === 'alive') continue;
-
-    for (const recipientId of recipientIDs) {
-      const recipientCID = await contractProvider.getRecipientCID(recipientId);
-      const recipient    = await retrieveDataFromPinata(recipientCID);
-      const wants      = recipient.requiredOrgan;
-      const hasOrgan = donor.organsAvailable.includes(wants);
-      const sameBlood = donor.bloodType.toLowerCase() === recipient.bloodType.toLowerCase();
+  const matches= [];
+  const recipients= [];
+  for(const recipientId of recipientIDs){
+    const recipientCID = await contractProvider.getRecipientCID(recipientId);
+    const recipient    = await retrieveDataFromPinata(recipientCID);
+    recipients.push(recipient);
+  }
+  //sorting according to the urgency level
+  {
+    console.log(recipients);
+    let n=recipients.length;
+    let i=0,j=n-1,k=0;
+    while(k<=j){
+      if(recipients[k].urgency==="high"){
+        console.log("i:",i,k);
+        let temp=recipients[k];
+        recipients[k]=recipients[i];
+        recipients[i]=temp;
+        i++;
+        k++;
+      }else if(recipients[k].urgency==="low"){
+        console.log("j:",j,k,recipients[k].name);
+        let temp=recipients[k];
+        recipients[k]=recipients[j];
+        recipients[j]=temp;
+        j--;
+      }else{
+        k++;
+      }
+    }
+    console.log(recipients);
+  }
+  for (const recipient of recipients){
+    for (const donorId of donorIDs){
+      const donorCID= await contractProvider.getDonorCID(donorId);
+      const donor= await retrieveDataFromPinata(donorCID);
+      if (donor.status==='alive') continue;
+      const wants= recipient.requiredOrgan;
+      const hasOrgan= donor.organsAvailable.includes(wants);
+      const sameBlood= donor.bloodType.toLowerCase() === recipient.bloodType.toLowerCase();
       if (!hasOrgan || !sameBlood) continue;
 
-      // const already = existing.some(r =>
-      //   r.donorId     === donorId &&
-      //   r.recipientId === recipientId &&
-      //   r.organ       === wants
-      // );
-      // if (already) continue;
-
-      const matchDate = Math.floor(Date.now()/1000);
-      const nextID    = matches.length;
-      const recordId  = `M${nextID.toString()}`;
+      const matchDate= Math.floor(Date.now()/1000);
+      const nextID= matches.length;
+      const recordId= `M${nextID.toString()}`;
       matches.push({
         recordId,
         donorId,
-        recipientId,
+        recipientId:recipient.recipientId,
         organ: wants,
         matchDate: matchDate.toString(),
         status: 'matched'
