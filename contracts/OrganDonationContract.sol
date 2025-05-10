@@ -82,15 +82,15 @@ contract OrganDonationContract {
         emit DonorRegistered(donorId);
     }
 
-    function getDonorIDs() public view returns (string[] memory){
+    function getDonorIDs() public view returns(string[] memory){
         return donorIDs;
     }
 
-    function getDonorCID(string memory _donorId) public view returns (string memory){
+    function getDonorCID(string memory _donorId) public view returns(string memory){
         return donorCIDs[_donorId];
     }
 
-    function removeDonor(string memory _donorId) public {
+    function removeDonor(string memory _donorId) public{
         bool found=false;
         uint index;
         for(index=0;index<donorIDs.length;index++){
@@ -117,15 +117,15 @@ contract OrganDonationContract {
         emit RecipientRegistered(recipientId);
     }
 
-    function getRecipientIDs() public view returns (string[] memory){
+    function getRecipientIDs() public view returns(string[] memory){
         return recipientIDs;
     }
 
-    function getRecipientCID(string memory _recipientId) public view returns (string memory){
+    function getRecipientCID(string memory _recipientId) public view returns(string memory){
         return recipientCIDs[_recipientId];
     }
 
-    function removeRecipient(string memory _recipientId) public {
+    function removeRecipient(string memory _recipientId) public{
         bool found=false;
         uint index;
         for(index=0;index<recipientIDs.length;index++){
@@ -161,11 +161,11 @@ contract OrganDonationContract {
         emit Transplanted(_recordId, _donorId, _recipientId, _organ, _matchDate);
     }
     
-    function getTransplantedRecords() public view returns (TransplantedRecord[] memory) {
+    function getTransplantedRecords() public view returns(TransplantedRecord[] memory) {
         return TransplantedRecords;
     }
     
-    function getMessage() public pure returns (string memory){
+    function getMessage() public pure returns(string memory){
         return "Blockchain Connected successfully!";
     }
 
