@@ -33,7 +33,7 @@ export const insertTransplantedRecord=async (record) => {
       newDonorCID
     );
     await tx.wait();
-    console.log("Transplant record inserted successfully!");
+    //console.log("Transplant record inserted successfully!");
   }catch(error){
     console.error("Error in inserting record in Blockchain:", error);
     throw error;
@@ -61,18 +61,33 @@ export const getAllTransplantedRecords = async () => {
   }
 };
 
+//cryptojs to encrypt and decrypt using secretkey
+import CryptoJS from 'crypto-js'
+const SECRET_KEY= import.meta.env.VITE_SECRET_KEY;
+//function that encrypts the given object
+function encrypt(obj){
+  const jsonStr = JSON.stringify(obj);
+  const ciphertext = CryptoJS.AES.encrypt(jsonStr, SECRET_KEY).toString();
+  return ciphertext;
+}
+//function that decrypts the given encryptedText
+function decrypt(encryptedText){
+  const bytes = CryptoJS.AES.decrypt(encryptedText, SECRET_KEY);
+  const decryptedStr = bytes.toString(CryptoJS.enc.Utf8);
+  return JSON.parse(decryptedStr);
+}
 //pinata jwt
 const PINATA_JWT = import.meta.env.VITE_PINATA_JWT;
-
 //uploading data to pinata ipfs
 export async function uploadDataToPinata(obj) {
+  const encrypted = encrypt(obj);
   const res = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${PINATA_JWT}`,
     },
-    body: JSON.stringify({ pinataContent: obj }),
+    body: JSON.stringify({ pinataContent: encrypted }),
   });
   if (!res.ok) {
     const err = await res.text();
@@ -88,7 +103,9 @@ export async function retrieveDataFromPinata(cid) {
   if (!res.ok) {
     throw new Error(`Gateway fetch failed: ${res.status} ${res.statusText}`);
   }
-  return res.json();
+  const encrypted = await res.json();
+  const decrypted = decrypt(encrypted);
+  return decrypted;
 }
 
 export const getAllMatchedRecords = async () => {
@@ -104,19 +121,16 @@ export const getAllMatchedRecords = async () => {
   }
   //sorting according to the urgency level
   {
-    console.log(recipients);
     let n=recipients.length;
     let i=0,j=n-1,k=0;
     while(k<=j){
       if(recipients[k].urgency==="high"){
-        console.log("i:",i,k);
         let temp=recipients[k];
         recipients[k]=recipients[i];
         recipients[i]=temp;
         i++;
         k++;
       }else if(recipients[k].urgency==="low"){
-        console.log("j:",j,k,recipients[k].name);
         let temp=recipients[k];
         recipients[k]=recipients[j];
         recipients[j]=temp;
@@ -125,7 +139,6 @@ export const getAllMatchedRecords = async () => {
         k++;
       }
     }
-    console.log(recipients);
   }
   for (const recipient of recipients){
     for (const donorId of donorIDs){
@@ -180,11 +193,6 @@ export const transplant = async (record) => {
     throw err;
   }
 };
-
-// export const getDonorCID = async (id)=>{
-//   const donorcid =await contractProvider.getDonorCID(id);
-//   console.log(donorcid);
-// }
 
 //Update Donor Status
 export const updateDonorStatus = async (donorId, status) => {
