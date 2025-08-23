@@ -64,9 +64,9 @@ contract OrganDonationContract {
     TransplantedRecord[] private TransplantedRecords;
     
     //events to log activities
-    event DonorRegistered(string donorId);
-    event RecipientRegistered(string recipientId);
-    event Transplanted(string recordId, string donorId, string recipientId, string organ, uint matchDate);
+    event DonorRegistered(address indexed sender,string indexed donorId);
+    event RecipientRegistered(address indexed sender,string indexed recipientId);
+    event Transplanted(address indexed sender,string indexed recordId,string donorId,string recipientId,string organ,uint matchDate);
     
     function getCurrentAvailableDonorID() public view returns(uint){
         return CurrentAvailableDonorID;
@@ -79,7 +79,7 @@ contract OrganDonationContract {
             donorIDs.push(donorId);
             CurrentAvailableDonorID++;
         }
-        emit DonorRegistered(donorId);
+        emit DonorRegistered(msg.sender,donorId);
     }
 
     function getDonorIDs() public view returns(string[] memory){
@@ -114,7 +114,7 @@ contract OrganDonationContract {
         recipientCIDs[recipientId]=cid;
         recipientIDs.push(recipientId);
         CurrentAvailableRecipientID++;
-        emit RecipientRegistered(recipientId);
+        emit RecipientRegistered(msg.sender,recipientId);
     }
 
     function getRecipientIDs() public view returns(string[] memory){
@@ -158,7 +158,7 @@ contract OrganDonationContract {
         CurrentAvailableTransplantedID++;
         removeRecipient(_recipientId);
         registerDonor(_donorId,newDonorCID);
-        emit Transplanted(_recordId, _donorId, _recipientId, _organ, _matchDate);
+        emit Transplanted(msg.sender,_recordId,_donorId,_recipientId,_organ,_matchDate);
     }
     
     function getTransplantedRecords() public view returns(TransplantedRecord[] memory) {
