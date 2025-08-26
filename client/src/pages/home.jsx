@@ -87,7 +87,7 @@ const LandingPage = () => {
         <div className="min-h-screen">
             {/* Hero Section */}
             <header className="relative flex items-center justify-center h-screen p-8 bg-cover bg-center text-white overflow-hidden"
-    style={{ backgroundImage: `url('https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTEyL3Jhd3BpeGVsb2ZmaWNlMjFfMmRfbWluaW1hbF9ncnBoaWNfb2ZfYmxvY2tjaGFpbl9jdWJlc19uZXR3b3JrX182NjExODM0My0xZWQ5LTRiOGUtYTdmOC03ZTc0ODEzZWEwNTNfMS5qcGc.jpg')` }}
+    //style={{ backgroundImage: `url('https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTEyL3Jhd3BpeGVsb2ZmaWNlMjFfMmRfbWluaW1hbF9ncnBoaWNfb2ZfYmxvY2tjaGFpbl9jdWJlc19uZXR3b3JrX182NjExODM0My0xZWQ5LTRiOGUtYTdmOC03ZTc0ODEzZWEwNTNfMS5qcGc.jpg')` }}
 >
     <div className="absolute inset-0 bg-black opacity-20"></div> {/* Overlay for better text readability */}
     <div className="relative z-10 text-center max-w-5xl animate-slide-up">
@@ -98,13 +98,23 @@ const LandingPage = () => {
                 <div className="header-decoration"></div>
             </div>
         </div>
-
         {showButtons && (
-            <div className="flex flex-col gap-4 items-center">
-                <button onClick={() => navigate('/donor-registration')} className="button-79">Donor Registration</button>
-                <button onClick={() => navigate('/recipient-registration')} className="button-79">Recipient Registration</button>
-                <button onClick={() => navigate('/getMatchedRecords')} className="button-79">View Matched Records</button>
-                <button onClick={() => navigate('/getTransplantedRecords')} className="button-79">Transplant Records</button>
+            
+            <div className="flex justify-center items-start gap-12 mt-8">
+                 <div className="flex flex-col items-center w-60 text-center">
+                    <img src="https://thumbs.dreamstime.com/b/organ-donation-concept-hand-giving-heart-organ-donation-concept-hand-giving-heart-surgeons-background-99199301.jpg" alt="Be a Donor" className="w-75 h-60 object-cover rounded-lg mb-3"  />
+                    <p className="text-lg font-bold text-green-800">Give Life, Be a Donor 💚</p>
+                </div>
+                 <div className="flex flex-col gap-4 items-center">
+                    <button onClick={() => navigate('/donor-registration')} className="button-79">Donor Registration</button>
+                    <button onClick={() => navigate('/recipient-registration')} className="button-79">Recipient Registration</button>
+                    <button onClick={() => navigate('/getMatchedRecords')} className="button-79">View Matched Records</button>
+                    <button onClick={() => navigate('/getTransplantedRecords')} className="button-79">Transplant Records</button>
+             </div>     
+                <div className="flex flex-col items-center w-60 text-center">
+                    <img src="https://www.sakraworldhospital.com/assets/spl_splimgs/organ-donation-2020-1.webp" alt="Save Lives" className="w-75 h-60 object-cover rounded-lg mb-3"  />
+                    <p className="text-lg font-bold text-red-800">One Donor Can Save Many Lives ❤️</p>
+                </div>
             </div>
         )}
 

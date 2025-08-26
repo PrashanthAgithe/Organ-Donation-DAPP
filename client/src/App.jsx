@@ -8,23 +8,23 @@ import TransplantedRecordsTable from "./pages/transplantedRecords";
 import { initContracts } from "./contract";
 
 function App() {
-  const [authorized, setAuthorized] = useState(null); // null = loading
+  // const [authorized, setAuthorized] = useState(null); // null = loading
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const result = await initContracts();
-      setAuthorized(result);
-    };
-    checkAuth();
-  }, []);
+  // useEffect(() => {
+  //   const checkAuth = async () => {
+  //     const result = await initContracts();
+  //     setAuthorized(result);
+  //   };
+  //   checkAuth();
+  // }, []);
 
-  if (authorized === null) {
-    return <div>Loading...</div>;
-  }
+  // if (authorized === null) {
+  //   return <div>Loading...</div>;
+  // }
 
-  if (!authorized) {
-    return null; // or display a full-screen error component
-  }
+  // if (!authorized) {
+  //   return null; // or display a full-screen error component
+  // }
 
   return (
     <Routes>
