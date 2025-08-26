@@ -89,7 +89,7 @@ const LandingPage = () => {
             <header className="relative flex items-center justify-center h-screen p-8 bg-cover bg-center text-white overflow-hidden"
     //style={{ backgroundImage: `url('https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTEyL3Jhd3BpeGVsb2ZmaWNlMjFfMmRfbWluaW1hbF9ncnBoaWNfb2ZfYmxvY2tjaGFpbl9jdWJlc19uZXR3b3JrX182NjExODM0My0xZWQ5LTRiOGUtYTdmOC03ZTc0ODEzZWEwNTNfMS5qcGc.jpg')` }}
 >
-    <div className="absolute inset-0 bg-black opacity-20"></div> {/* Overlay for better text readability */}
+    <div className="absolute inset-0 opacity-20"></div>
     <div className="relative z-10 text-center max-w-5xl animate-slide-up">
         <div className="header-container">
             <div className="header-content">
