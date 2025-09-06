@@ -108,7 +108,8 @@ const LandingPage = () => {
                  <div className="flex flex-col gap-4 items-center">
                     <button onClick={() => navigate('/donor-registration')} className="button-79">Donor Registration</button>
                     <button onClick={() => navigate('/recipient-registration')} className="button-79">Recipient Registration</button>
-                    <button onClick={() => navigate('/getMatchedRecords')} className="button-79">View Matched Records</button>
+                    {/* <button onClick={() => navigate('/getMatchedRecords')} className="button-79">View Matched Records</button> */}
+                    <button onClick={() => navigate('/findDonors')} className="button-79">Find Donors</button>
                     <button onClick={() => navigate('/getTransplantedRecords')} className="button-79">Transplant Records</button>
              </div>     
                 <div className="flex flex-col items-center w-60 text-center">

@@ -4,6 +4,7 @@ import LandingPage from "./pages/home";
 import DonorRegistration from "./pages/DonorRegistration";
 import RecipientRegistration from "./pages/RecipentRegistration";
 import MatchedRecordsTable from "./pages/matchedRecords";
+import FindDonors from "./pages/FindDonors";
 import TransplantedRecordsTable from "./pages/transplantedRecords";
 import { initContracts,isAuthorized } from "./contract";
 function App() {
@@ -24,13 +25,14 @@ function App() {
   if (!metamask) {
     return null; // or display a full-screen error component
   }
-  console.log(isAuthorized);
+  // console.log(isAuthorized);
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/donor-registration" element={<DonorRegistration />} />
       <Route path="/recipient-registration" element={<RecipientRegistration />} />
-      <Route path="/getMatchedRecords" element={<MatchedRecordsTable />} />
+      {/* <Route path="/getMatchedRecords" element={<MatchedRecordsTable />} /> */}
+      <Route path="/findDonors" element={<FindDonors />} />
       <Route path="/getTransplantedRecords" element={<TransplantedRecordsTable />} />
     </Routes>
   );

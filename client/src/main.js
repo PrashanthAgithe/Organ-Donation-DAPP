@@ -212,3 +212,16 @@ export const updateDonorStatus = async (donorId, status) => {
     console.error("Error in updating donor status on Blockchain:", error);
   }
 };
+
+export const getCityName = async (lat, lng) => {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+    )
+    const data = await res.json()
+    return data.address.city || data.address.town || data.address.village || "Unknown"
+  } catch (e) {
+    console.error("Error fetching city name:", e)
+    return "Unknown"
+  }
+}

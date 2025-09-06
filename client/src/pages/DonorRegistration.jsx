@@ -87,7 +87,7 @@ const DonorRegistration = () => {
       donorId:nextID,
       location: userLocation
     };
-    // console.log("Donor Data:", donordata);
+    console.log("Donor Data:", donordata);
 
     const toastId = toast.loading('Registering...', {
       position: 'bottom-right',
