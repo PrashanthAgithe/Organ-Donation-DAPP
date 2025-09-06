@@ -26,6 +26,8 @@ const DonorRegistration = () => {
   const [nextID,setnextID] = useState("");
   const [isloading,setisloading] = useState(false);
   
+  const [userLocation, setUserLocation] = useState(null);
+
   useEffect(()=>{
     async function getnextID(){
       const id = await contractProvider.getCurrentAvailableDonorID();
@@ -33,6 +35,25 @@ const DonorRegistration = () => {
     }
     getnextID();
   },[]);
+
+  // Fetch location once when component mounts
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setUserLocation({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+        },
+        () => {
+          setUserLocation(null); // fallback if denied or error
+        }
+      );
+    } else {
+      setUserLocation(null);
+    }
+  }, []);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -64,8 +85,10 @@ const DonorRegistration = () => {
     let donordata = {
       ...formData,
       donorId:nextID,
+      location: userLocation
     };
     // console.log("Donor Data:", donordata);
+
     const toastId = toast.loading('Registering...', {
       position: 'bottom-right',
       style: {
