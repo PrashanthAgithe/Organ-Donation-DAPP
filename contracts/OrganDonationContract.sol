@@ -72,7 +72,7 @@ contract OrganDonationContract {
         return CurrentAvailableDonorID;
     }
 
-    function registerDonor(string memory donorId, string memory cid) public onlyAuthorized{
+    function registerDonor(string memory donorId, string memory cid) public {
         bool exists = bytes(donorCIDs[donorId]).length > 0;
         donorCIDs[donorId] = cid;
         if (!exists) {
@@ -110,7 +110,7 @@ contract OrganDonationContract {
         return CurrentAvailableRecipientID;
     }
 
-    function registerRecipient(string memory recipientId,string memory cid) public onlyAuthorized{
+    function registerRecipient(string memory recipientId,string memory cid) public {
         recipientCIDs[recipientId]=cid;
         recipientIDs.push(recipientId);
         CurrentAvailableRecipientID++;
