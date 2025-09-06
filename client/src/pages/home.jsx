@@ -28,7 +28,7 @@ import { updateDonorStatus } from "../main";
 
 const LandingPage = () => {
     const navigate = useNavigate();
-    const [status, setStatus] = useState("deceased");
+    const [status, setStatus] = useState("available");
     const [donorId, setDonorId] = useState("");
     const [showButtons, setShowButtons] = useState(true);
     const whiteSectionRef = useRef(null);
@@ -149,15 +149,15 @@ const LandingPage = () => {
                     <div className="mb-6">
                         <Label className="block text-sm font-medium text-gray-700 mb-1">Status</Label>
                         <Select
-                            defaultValue="deceased"
+                            defaultValue="available"
                             onValueChange={(value) => setStatus(value)}
                         >
                             <SelectTrigger className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-organ-primary focus:border-organ-primary transition-all">
                                 <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                             <SelectContent position="item-aligned" className="bg-white border-0 shadow-lg rounded-lg">
-                                <SelectItem value="deceased" className="p-2 cursor-pointer hover:bg-gray-100 rounded-md">Deceased</SelectItem>
-                                <SelectItem value="alive" disabled className="p-2 text-gray-400">Alive</SelectItem>
+                                <SelectItem value="available" className="p-2 cursor-pointer hover:bg-gray-100 rounded-md">Available</SelectItem>
+                                <SelectItem value="unavailable" className="p-2 cursor-pointer hover:bg-gray-100 rounded-md">Unavailable</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

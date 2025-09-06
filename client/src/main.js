@@ -144,7 +144,7 @@ export const getAllMatchedRecords = async () => {
     for (const donorId of donorIDs){
       const donorCID= await contractProvider.getDonorCID(donorId);
       const donor= await retrieveDataFromPinata(donorCID);
-      if (donor.status==='alive') continue;
+      if (donor.status==='unavailable') continue;
       const wants= recipient.requiredOrgan;
       const hasOrgan= donor.organsAvailable.includes(wants);
       const sameBlood= donor.bloodType.toLowerCase() === recipient.bloodType.toLowerCase();
@@ -200,8 +200,8 @@ export const updateDonorStatus = async (donorId, status) => {
     // Call the updateDonorStatus function on the contract
     const donorCID = await contractProvider.getDonorCID(donorId);
     const donor    = await retrieveDataFromPinata(donorCID);
-    
-    if(status=='deceased' && donor.status!=='deceased'){
+
+    if(status !== donor.status){
       donor.status=status;
       const newCid = await uploadDataToPinata(donor);
       const tx = await contractSigner.registerDonor(donorId, newCid);

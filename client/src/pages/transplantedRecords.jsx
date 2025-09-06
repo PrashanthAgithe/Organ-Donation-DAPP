@@ -129,7 +129,7 @@ export default function TransplantedRecordsTable() {
                     <p><strong>Age:</strong> {selectedDetails.age}</p>
                     <p><strong>Blood Type:</strong> {selectedDetails.bloodType}</p>
                     <p><strong>Transplanted Organ:</strong> {selectedDetails.transplantedOrgan}</p>
-                    <p><strong>Contact Info:</strong> {selectedDetails.contactInfo}</p>
+                    {/* <p><strong>Contact Info:</strong> {selectedDetails.contactInfo}</p> */}
                     {isDonor?<p><strong>Status:</strong> {selectedDetails.status}</p>:<></>}
                   </>
                 )}

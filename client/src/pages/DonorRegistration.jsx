@@ -40,7 +40,7 @@ const DonorRegistration = () => {
     bloodType: "",
     organsAvailable: [],
     contactInfo: "",
-    status: "alive",
+    status: "unavailable",
   });
 
   const organsList = ["Heart", "Liver", "Kidney", "Lungs", "Pancreas", "Intestines", "Corneas"];
@@ -144,8 +144,8 @@ const DonorRegistration = () => {
                 <SelectValue placeholder="Select Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="alive">Alive</SelectItem>
-                <SelectItem value="deceased">Deceased</SelectItem>
+                <SelectItem value="unavailable">Unavailable</SelectItem>
+                <SelectItem value="available">Available</SelectItem>
               </SelectContent>
             </Select>
           </div>
