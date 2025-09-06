@@ -5,27 +5,26 @@ import DonorRegistration from "./pages/DonorRegistration";
 import RecipientRegistration from "./pages/RecipentRegistration";
 import MatchedRecordsTable from "./pages/matchedRecords";
 import TransplantedRecordsTable from "./pages/transplantedRecords";
-import { initContracts } from "./contract";
-
+import { initContracts,isAuthorized } from "./contract";
 function App() {
-  const [authorized, setAuthorized] = useState(null); // null = loading
+  const [metamask, setMetamask] = useState(null); // null = loading
 
   useEffect(() => {
     const checkAuth = async () => {
       const result = await initContracts();
-      setAuthorized(result);
+      setMetamask(result);
     };
     checkAuth();
   }, []);
 
-  if (authorized === null) {
+  if (metamask === null) {
     return <div>Loading...</div>;
   }
 
-  if (!authorized) {
+  if (!metamask) {
     return null; // or display a full-screen error component
   }
-
+  console.log(isAuthorized);
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />

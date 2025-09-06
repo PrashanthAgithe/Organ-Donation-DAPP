@@ -5,6 +5,7 @@ import OrganDonationContractABI from '../../artifacts/contracts/OrganDonationCon
 const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
 let contractProvider;
 let contractSigner;
+let isAuthorized = false;
 
 const isAddressAllowed = async (address) => {
   try {
@@ -29,18 +30,18 @@ const initContracts = async () => {
   
   // const signer = new ethers.Wallet(import.meta.env.VITE_PRIVATE_KEY, provider);
   const signer = await provider.getSigner();
-
+  contractSigner = new ethers.Contract(contractAddress, OrganDonationContractABI.abi, signer);
+  
   const userAddress = await signer.getAddress();
   // console.log("Connected Wallet:", userAddress);
 
   const allowed = await isAddressAllowed(userAddress);
   if (allowed) {
-    contractSigner = new ethers.Contract(contractAddress, OrganDonationContractABI.abi, signer);
-    return true;
+    isAuthorized = true;
   } else {
-    alert("You are not Authorized to use this website!");
-    return false;
+    isAuthorized = false;
   }
+  return true;
 };
 
-export { contractProvider, contractSigner, initContracts };
+export { contractProvider, contractSigner, isAuthorized, initContracts };
